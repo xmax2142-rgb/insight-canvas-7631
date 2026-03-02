@@ -4,6 +4,8 @@ import HeroSection from "@/components/HeroSection";
 import IntroSection from "@/components/IntroSection";
 import { Calendar } from "@/components/ui/calendar";
 import { ShieldAlert, Wrench, Radar, ArrowUpRight } from "lucide-react";
+import { useViolations } from "@/hooks/useViolations";
+import { mockRemediationItems } from "@/lib/mockData";
 
 const hubs = [
   {
@@ -34,13 +36,26 @@ const hubs = [
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const { violations, openCount: openViolations, totalCount: totalViolations } = useViolations();
+
+  const openRemediations = mockRemediationItems.filter(i => i.status === "open" || i.status === "in_progress").length;
+  const closedRemediations = mockRemediationItems.filter(i => i.status === "closed").length;
+  const totalRemediations = mockRemediationItems.length;
+  const criticalFindings = mockRemediationItems.filter(i => i.priority === "critical" && i.status !== "closed").length;
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <HeroSection />
+        <HeroSection
+          totalViolations={totalViolations}
+          openViolations={openViolations}
+          openRemediations={openRemediations}
+          closedRemediations={closedRemediations}
+          totalRemediations={totalRemediations}
+          criticalFindings={criticalFindings}
+        />
         <IntroSection />
 
         {/* Hub Shortcuts */}
