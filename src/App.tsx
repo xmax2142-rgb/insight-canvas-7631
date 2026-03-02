@@ -15,7 +15,7 @@ import Contact from "./pages/Contact";
 import StyleGuide from "./pages/StyleGuide";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
-import Violations from "./pages/Violations";
+import ViolationsHub from "./pages/ViolationsHub";
 import RemediationLogin from "./pages/RemediationLogin";
 import RemediationAdmin from "./pages/RemediationAdmin";
 import RemediationDashboard from "./pages/RemediationDashboard";
@@ -44,7 +44,7 @@ const App = () => (
           <Route path="/style-guide" element={<StyleGuide />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/violations" element={<Violations />} />
+          <Route path="/violations" element={<ViolationsHub />} />
           <Route path="/remediation" element={<RemediationLogin />} />
           <Route path="/remediation/admin" element={<RemediationAdmin />} />
           <Route path="/remediation/dashboard" element={<RemediationDashboard />} />
