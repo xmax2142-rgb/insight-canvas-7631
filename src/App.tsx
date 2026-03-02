@@ -16,7 +16,10 @@ import StyleGuide from "./pages/StyleGuide";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Violations from "./pages/Violations";
-import Remediation from "./pages/Remediation";
+import RemediationLogin from "./pages/RemediationLogin";
+import RemediationAdmin from "./pages/RemediationAdmin";
+import RemediationDashboard from "./pages/RemediationDashboard";
+import RemediationItemDetail from "./pages/RemediationItemDetail";
 import Events from "./pages/Events";
 import NotFound from "./pages/NotFound";
 
@@ -42,7 +45,10 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/violations" element={<Violations />} />
-          <Route path="/remediation" element={<Remediation />} />
+          <Route path="/remediation" element={<RemediationLogin />} />
+          <Route path="/remediation/admin" element={<RemediationAdmin />} />
+          <Route path="/remediation/dashboard" element={<RemediationDashboard />} />
+          <Route path="/remediation/item/:id" element={<RemediationItemDetail />} />
           <Route path="/events" element={<Events />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
