@@ -1,58 +1,85 @@
+import { useState } from "react";
 import Header from "@/components/Header";
-import ArticleCard from "@/components/ArticleCard";
 import HeroSection from "@/components/HeroSection";
 import IntroSection from "@/components/IntroSection";
-import { articles } from "@/data/articles";
+import { Calendar } from "@/components/ui/calendar";
+import { ShieldAlert, Wrench, Radar, ArrowUpRight } from "lucide-react";
+
+const hubs = [
+  {
+    title: "Cyber Violations Hub",
+    description: "Track, investigate, and resolve cybersecurity policy violations across your organization.",
+    href: "/violations",
+    icon: ShieldAlert,
+    accentColor: "border-l-red-500",
+    iconColor: "text-red-500",
+  },
+  {
+    title: "Remediation Hub",
+    description: "Monitor remediation progress from assessments and ensure timely resolution of findings.",
+    href: "/remediation",
+    icon: Wrench,
+    accentColor: "border-l-amber-500",
+    iconColor: "text-amber-500",
+  },
+  {
+    title: "Event Horizon Hub",
+    description: "Schedule and manage cybersecurity events, audits, training sessions, and deadlines.",
+    href: "/events",
+    icon: Radar,
+    accentColor: "border-l-cyan-500",
+    iconColor: "text-cyan-500",
+  },
+];
 
 const Index = () => {
-  const featuredArticles = articles.slice(0, 6);
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       <Header />
-      
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section */}
-        <HeroSection />
 
-        {/* Intro Section */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <HeroSection />
         <IntroSection />
 
-        {/* Featured Articles Grid */}
-        <section id="articles" className="py-12">
-          <div className="flex items-center justify-between mb-12 animate-slide-up">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Featured Articles</h2>
-            <a href="#all" className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors px-4 py-2 rounded-full hover:bg-muted/60">
-              View all →
-            </a>
+        {/* Hub Shortcuts */}
+        <section className="py-12">
+          <div className="flex items-center justify-between mb-8 animate-slide-up">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Command Hubs</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredArticles.map((article, index) => (
-              <div key={article.id} className={`animate-slide-up stagger-${Math.min(index + 1, 6)}`}>
-                <ArticleCard {...article} size="small" />
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {hubs.map((hub, index) => {
+              const Icon = hub.icon;
+              return (
+                <a
+                  key={hub.title}
+                  href={hub.href}
+                  className={`group rounded-2xl bg-card border border-border/50 border-l-4 ${hub.accentColor} p-6 md:p-8 flex flex-col gap-4 card-hover animate-slide-up stagger-${Math.min(index + 1, 3)} no-underline`}
+                >
+                  <div className="flex items-center justify-between">
+                    <Icon className={`w-8 h-8 ${hub.iconColor}`} />
+                    <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                  </div>
+                  <h3 className="text-xl font-bold">{hub.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{hub.description}</p>
+                </a>
+              );
+            })}
           </div>
         </section>
 
-        {/* Newsletter Section */}
-        <section className="my-20 rounded-[2.5rem] bg-card p-12 md:p-16 text-center animate-scale-in">
-          <div className="max-w-2xl mx-auto space-y-8">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Stay inspired.</h2>
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              Subscribe to receive our latest articles and insights directly in your inbox.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="flex-1 px-6 py-4 rounded-full border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring transition-all"
-              />
-              <button className="px-10 py-4 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 hover:scale-105 transition-all">
-                Subscribe
-              </button>
-            </div>
+        {/* Activity Calendar */}
+        <section className="py-12">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 animate-slide-up">Activity Calendar</h2>
+          <div className="rounded-2xl bg-card border border-border/50 p-6 md:p-8 inline-block animate-scale-in">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              className="pointer-events-auto"
+            />
           </div>
         </section>
       </main>
@@ -62,27 +89,25 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="font-semibold mb-4">Explore</h3>
+              <h3 className="font-semibold mb-4">Hubs</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/wellness" className="hover:text-accent transition-colors">Wellness</a></li>
-                <li><a href="/travel" className="hover:text-accent transition-colors">Travel</a></li>
-                <li><a href="/creativity" className="hover:text-accent transition-colors">Creativity</a></li>
-                <li><a href="/growth" className="hover:text-accent transition-colors">Growth</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">About</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/about" className="hover:text-accent transition-colors">Our Story</a></li>
-                <li><a href="/authors" className="hover:text-accent transition-colors">Authors</a></li>
-                <li><a href="/contact" className="hover:text-accent transition-colors">Contact</a></li>
+                <li><a href="/violations" className="hover:text-accent transition-colors">Violations</a></li>
+                <li><a href="/remediation" className="hover:text-accent transition-colors">Remediation</a></li>
+                <li><a href="/events" className="hover:text-accent transition-colors">Events</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Resources</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/style-guide" className="hover:text-accent transition-colors">Style Guide</a></li>
-                <li><a href="/#newsletter" className="hover:text-accent transition-colors">Newsletter</a></li>
+                <li><a href="/about" className="hover:text-accent transition-colors">About</a></li>
+                <li><a href="/contact" className="hover:text-accent transition-colors">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Settings</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-accent transition-colors">Profile</a></li>
+                <li><a href="#" className="hover:text-accent transition-colors">Notifications</a></li>
               </ul>
             </div>
             <div>
@@ -94,7 +119,7 @@ const Index = () => {
             </div>
           </div>
           <div className="pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            <p>© 2025 Perspective. All rights reserved.</p>
+            <p>© 2025 CyberGRC. All rights reserved.</p>
           </div>
         </div>
       </footer>
