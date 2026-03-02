@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X, Moon, Sun, Shield, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header = () => {
@@ -38,28 +38,25 @@ const Header = () => {
           <div className="flex items-center min-w-0">
             <a href="/" className="flex items-center gap-1.5 sm:gap-2">
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-                <span className="text-primary-foreground font-bold text-base sm:text-lg">P</span>
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
               </div>
-              <span className="text-base sm:text-xl font-bold font-serif truncate">Perspective</span>
+              <span className="text-base sm:text-xl font-bold font-serif truncate">CyberGRC</span>
             </a>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2">
             <a href="/" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
-              Home
+              Dashboard
             </a>
-            <a href="/#articles" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
-              Articles
+            <a href="/violations" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
+              Violations
             </a>
-            <a href="/wellness" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
-              Wellness
+            <a href="/remediation" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
+              Remediation
             </a>
-            <a href="/travel" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
-              Travel
-            </a>
-            <a href="/about" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
-              About
+            <a href="/events" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
+              Events
             </a>
           </nav>
 
@@ -77,8 +74,9 @@ const Header = () => {
               )}
             </button>
             
-            <Button className="hidden md:flex bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 py-2 hover:scale-105 transition-all">
-              Join Now
+            <Button className="hidden md:flex bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2 hover:scale-105 transition-all gap-2">
+              <Settings className="w-4 h-4" />
+              Settings
             </Button>
 
             {/* Mobile Menu Button */}
@@ -97,22 +95,20 @@ const Header = () => {
           <div className="md:hidden py-4 border-t border-border animate-fade-in">
             <nav className="flex flex-col gap-4">
               <a href="/" className="text-sm font-medium hover:text-accent transition-colors">
-                Home
+                Dashboard
               </a>
-              <a href="/#articles" className="text-sm font-medium hover:text-accent transition-colors">
-                Articles
+              <a href="/violations" className="text-sm font-medium hover:text-accent transition-colors">
+                Violations
               </a>
-              <a href="/wellness" className="text-sm font-medium hover:text-accent transition-colors">
-                Wellness
+              <a href="/remediation" className="text-sm font-medium hover:text-accent transition-colors">
+                Remediation
               </a>
-              <a href="/travel" className="text-sm font-medium hover:text-accent transition-colors">
-                Travel
+              <a href="/events" className="text-sm font-medium hover:text-accent transition-colors">
+                Events
               </a>
-              <a href="/about" className="text-sm font-medium hover:text-accent transition-colors">
-                About
-              </a>
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full w-full">
-                Join Now
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full w-full gap-2">
+                <Settings className="w-4 h-4" />
+                Settings
               </Button>
             </nav>
           </div>
