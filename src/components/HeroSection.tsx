@@ -1,57 +1,86 @@
-import { Shield, AlertTriangle, Wrench, Calendar, Activity, CheckCircle, TrendingUp, TrendingDown } from "lucide-react";
+import { Shield, AlertTriangle, Wrench, Calendar, Activity, CheckCircle, TrendingUp, TrendingDown, type LucideIcon } from "lucide-react";
 
-const kpiCards = [
-  {
-    label: "Total Violations",
-    value: "--",
-    icon: AlertTriangle,
-    borderColor: "border-l-red-500",
-    iconColor: "text-red-500",
-    trend: { direction: "up" as const, label: "+3 this week" },
-  },
-  {
-    label: "Open Remediations",
-    value: "--",
-    icon: Wrench,
-    borderColor: "border-l-amber-500",
-    iconColor: "text-amber-500",
-    trend: { direction: "down" as const, label: "-2 resolved" },
-  },
-  {
-    label: "Compliance Score",
-    value: "--%",
-    icon: Shield,
-    borderColor: "border-l-emerald-500",
-    iconColor: "text-emerald-500",
-    trend: { direction: "up" as const, label: "+5% improvement" },
-  },
-  {
-    label: "Upcoming Events",
-    value: "--",
-    icon: Calendar,
-    borderColor: "border-l-cyan-500",
-    iconColor: "text-cyan-500",
-    trend: { direction: "up" as const, label: "Next: TBD" },
-  },
-  {
-    label: "Critical Findings",
-    value: "--",
-    icon: Activity,
-    borderColor: "border-l-orange-500",
-    iconColor: "text-orange-500",
-    trend: { direction: "down" as const, label: "-1 mitigated" },
-  },
-  {
-    label: "Assessments Completed",
-    value: "--",
-    icon: CheckCircle,
-    borderColor: "border-l-green-500",
-    iconColor: "text-green-500",
-    trend: { direction: "up" as const, label: "+2 this month" },
-  },
-];
+interface KPICard {
+  label: string;
+  value: string | number;
+  icon: LucideIcon;
+  borderColor: string;
+  iconColor: string;
+  trend: { direction: "up" | "down"; label: string };
+}
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  totalViolations: number;
+  openViolations: number;
+  openRemediations: number;
+  closedRemediations: number;
+  totalRemediations: number;
+  criticalFindings: number;
+}
+
+const HeroSection = ({
+  totalViolations,
+  openViolations,
+  openRemediations,
+  closedRemediations,
+  totalRemediations,
+  criticalFindings,
+}: HeroSectionProps) => {
+  const complianceScore = totalRemediations > 0
+    ? Math.round((closedRemediations / totalRemediations) * 100)
+    : 0;
+
+  const kpiCards: KPICard[] = [
+    {
+      label: "Total Violations",
+      value: totalViolations,
+      icon: AlertTriangle,
+      borderColor: "border-l-red-500",
+      iconColor: "text-red-500",
+      trend: { direction: openViolations > 0 ? "up" : "down", label: `${openViolations} open` },
+    },
+    {
+      label: "Open Remediations",
+      value: openRemediations,
+      icon: Wrench,
+      borderColor: "border-l-amber-500",
+      iconColor: "text-amber-500",
+      trend: { direction: openRemediations > 0 ? "up" : "down", label: `${closedRemediations} resolved` },
+    },
+    {
+      label: "Compliance Score",
+      value: `${complianceScore}%`,
+      icon: Shield,
+      borderColor: "border-l-emerald-500",
+      iconColor: "text-emerald-500",
+      trend: { direction: complianceScore >= 50 ? "up" : "down", label: complianceScore >= 50 ? "On track" : "Needs attention" },
+    },
+    {
+      label: "Upcoming Events",
+      value: "--",
+      icon: Calendar,
+      borderColor: "border-l-cyan-500",
+      iconColor: "text-cyan-500",
+      trend: { direction: "up" as const, label: "Next: TBD" },
+    },
+    {
+      label: "Critical Findings",
+      value: criticalFindings,
+      icon: Activity,
+      borderColor: "border-l-orange-500",
+      iconColor: "text-orange-500",
+      trend: { direction: criticalFindings > 0 ? "up" : "down", label: criticalFindings > 0 ? `${criticalFindings} need action` : "All clear" },
+    },
+    {
+      label: "Assessments Completed",
+      value: closedRemediations,
+      icon: CheckCircle,
+      borderColor: "border-l-green-500",
+      iconColor: "text-green-500",
+      trend: { direction: "up" as const, label: `${closedRemediations} closed` },
+    },
+  ];
+
   return (
     <section className="py-8 animate-fade-in">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
