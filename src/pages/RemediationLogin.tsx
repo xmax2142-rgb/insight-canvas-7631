@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, ShieldCheck, UserCheck, Lock } from "lucide-react";
+import { Shield, ShieldCheck, UserCheck, Lock, Home } from "lucide-react";
 import { mockUsers } from "@/lib/mockData";
 
 const RemediationLogin = () => {
@@ -69,11 +69,18 @@ const RemediationLogin = () => {
       </div>
 
       {/* Right login panel */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-background">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 bg-background">
         <div className="w-full max-w-sm space-y-8">
-          <div className="lg:hidden flex items-center gap-3 justify-center">
-            <Shield className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">RAP System</span>
+          <div className="flex justify-between items-center">
+            <div className="lg:hidden flex items-center gap-3">
+              <Shield className="h-8 w-8 text-primary" />
+              <span className="text-xl font-bold">RAP System</span>
+            </div>
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="text-muted-foreground gap-1">
+                <Home className="h-4 w-4" /> Home
+              </Button>
+            </Link>
           </div>
 
           <div className="space-y-2 text-center lg:text-left">
