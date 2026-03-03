@@ -54,6 +54,17 @@ All colors MUST be HSL.
     --surface-elevated: 36 44% 98%;
     --shadow-soft: 0 0% 0%;
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Calendar category tokens */
+    --category-meetings: 220 70% 55%;
+    --category-audits: 280 60% 55%;
+    --category-compliance: 160 60% 45%;
+    --category-training: 35 80% 55%;
+
+    /* Calendar status tokens */
+    --status-completed: 140 60% 45%;
+    --status-overdue: 0 70% 55%;
+    --priority-high: 15 80% 55%;
   }
 
   .dark {
@@ -99,6 +110,16 @@ All colors MUST be HSL.
     --cream-foreground: 36 44% 96%;
     --surface-elevated: 0 0% 16%;
     --shadow-soft: 0 0% 0%;
+
+    /* Dark calendar category tokens */
+    --category-meetings: 220 60% 50%;
+    --category-audits: 280 50% 50%;
+    --category-compliance: 160 50% 40%;
+    --category-training: 35 70% 50%;
+
+    --status-completed: 140 50% 40%;
+    --status-overdue: 0 60% 50%;
+    --priority-high: 15 70% 50%;
   }
 }
 
@@ -233,6 +254,19 @@ All colors MUST be HSL.
     animation-delay: 0.6s;
     opacity: 0;
     animation-fill-mode: forwards;
+  }
+
+  .gradient-bg {
+    @apply bg-background;
+  }
+
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
   }
 
   .tag-financing {

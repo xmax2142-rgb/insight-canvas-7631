@@ -16,6 +16,7 @@ interface HeroSectionProps {
   closedRemediations: number;
   totalRemediations: number;
   criticalFindings: number;
+  upcomingEvents: number;
 }
 
 const HeroSection = ({
@@ -25,6 +26,7 @@ const HeroSection = ({
   closedRemediations,
   totalRemediations,
   criticalFindings,
+  upcomingEvents,
 }: HeroSectionProps) => {
   const complianceScore = totalRemediations > 0
     ? Math.round((closedRemediations / totalRemediations) * 100)
@@ -57,11 +59,11 @@ const HeroSection = ({
     },
     {
       label: "Upcoming Events",
-      value: "--",
+      value: upcomingEvents,
       icon: Calendar,
       borderColor: "border-l-cyan-500",
       iconColor: "text-cyan-500",
-      trend: { direction: "up" as const, label: "Next: TBD" },
+      trend: { direction: upcomingEvents > 0 ? "up" : "down", label: upcomingEvents > 0 ? `${upcomingEvents} scheduled` : "None scheduled" },
     },
     {
       label: "Critical Findings",
