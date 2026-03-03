@@ -61,6 +61,13 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "category-meetings": "hsl(var(--category-meetings))",
+        "category-audits": "hsl(var(--category-audits))",
+        "category-compliance": "hsl(var(--category-compliance))",
+        "category-training": "hsl(var(--category-training))",
+        "status-completed": "hsl(var(--status-completed))",
+        "status-overdue": "hsl(var(--status-overdue))",
+        "priority-high": "hsl(var(--priority-high))",
       },
       borderRadius: {
         lg: "var(--radius)",

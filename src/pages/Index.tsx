@@ -6,6 +6,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { ShieldAlert, Wrench, Radar, ArrowUpRight } from "lucide-react";
 import { useViolations } from "@/hooks/useViolations";
 import { mockRemediationItems } from "@/lib/mockData";
+import { mockEvents } from "@/data/mockEvents";
+import { isAfter, startOfToday } from "date-fns";
 
 const hubs = [
   {
@@ -42,6 +44,7 @@ const Index = () => {
   const closedRemediations = mockRemediationItems.filter(i => i.status === "closed").length;
   const totalRemediations = mockRemediationItems.length;
   const criticalFindings = mockRemediationItems.filter(i => i.priority === "critical" && i.status !== "closed").length;
+  const upcomingEvents = mockEvents.filter(ev => isAfter(ev.startDate, startOfToday()) && ev.status !== "completed").length;
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
@@ -55,6 +58,7 @@ const Index = () => {
           closedRemediations={closedRemediations}
           totalRemediations={totalRemediations}
           criticalFindings={criticalFindings}
+          upcomingEvents={upcomingEvents}
         />
         <IntroSection />
 
