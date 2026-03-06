@@ -1,4 +1,5 @@
 import { Shield, AlertTriangle, Wrench, Calendar, Activity, CheckCircle, TrendingUp, TrendingDown, type LucideIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface KPICard {
   label: string;
@@ -7,6 +8,7 @@ interface KPICard {
   borderColor: string;
   iconColor: string;
   trend: { direction: "up" | "down"; label: string };
+  href: string;
 }
 
 interface HeroSectionProps {
