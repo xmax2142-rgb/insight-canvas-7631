@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import HeroSection from "@/components/HeroSection";
 import IntroSection from "@/components/IntroSection";
 import { Calendar } from "@/components/ui/calendar";
 import { ShieldAlert, Wrench, Radar, ArrowUpRight } from "lucide-react";
