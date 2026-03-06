@@ -22,7 +22,13 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({
-  totalViolations,
+  ...props
+}: HeroSectionProps) => {
+  const navigate = useNavigate();
+  const {
+    totalViolations, openViolations, openRemediations,
+    closedRemediations, totalRemediations, criticalFindings, upcomingEvents,
+  } = props;
   openViolations,
   openRemediations,
   closedRemediations,
