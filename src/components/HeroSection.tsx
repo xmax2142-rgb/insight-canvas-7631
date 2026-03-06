@@ -101,7 +101,8 @@ const HeroSection = ({
           return (
             <div
               key={card.label}
-              className={`rounded-2xl bg-card border border-border/50 border-l-4 ${card.borderColor} p-5 md:p-6 flex flex-col gap-4 card-hover animate-slide-up stagger-${Math.min(index + 1, 6)}`}
+              onClick={() => navigate(card.href)}
+              className={`cursor-pointer rounded-2xl bg-card border border-border/50 border-l-4 ${card.borderColor} p-5 md:p-6 flex flex-col gap-4 card-hover animate-slide-up stagger-${Math.min(index + 1, 6)}`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">{card.label}</span>
