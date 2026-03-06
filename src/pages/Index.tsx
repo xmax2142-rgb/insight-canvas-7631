@@ -110,9 +110,15 @@ const Index = () => {
             <Calendar
               mode="single"
               selected={date}
-              onSelect={setDate}
+              onSelect={handleDateSelect}
+              modifiers={{ hasEvent: eventDateModifiers.hasEvent }}
+              modifiersClassNames={{ hasEvent: "has-event" }}
               className="pointer-events-auto"
             />
+            <p className="text-xs text-muted-foreground mt-4 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary inline-block" />
+              Dates with scheduled events — click to view in Events Hub
+            </p>
           </div>
         </section>
       </main>
