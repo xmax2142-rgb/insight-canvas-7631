@@ -39,6 +39,7 @@ const hubs = [
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const navigate = useNavigate();
   const { violations, openCount: openViolations, totalCount: totalViolations } = useViolations();
 
   const openRemediations = mockRemediationItems.filter(i => i.status === "open" || i.status === "in_progress").length;
@@ -46,6 +47,18 @@ const Index = () => {
   const totalRemediations = mockRemediationItems.length;
   const criticalFindings = mockRemediationItems.filter(i => i.priority === "critical" && i.status !== "closed").length;
   const upcomingEvents = mockEvents.filter(ev => isAfter(ev.startDate, startOfToday()) && ev.status !== "completed").length;
+
+  const eventDates = useMemo(() => mockEvents.map(ev => startOfDay(ev.startDate)), []);
+  const eventDateModifiers = useMemo(() => ({
+    hasEvent: (day: Date) => eventDates.some(d => isSameDay(d, day)),
+  }), [eventDates]);
+
+  const handleDateSelect = (selected: Date | undefined) => {
+    setDate(selected);
+    if (selected) {
+      navigate("/events");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
