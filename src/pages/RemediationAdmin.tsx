@@ -103,15 +103,15 @@ const RemediationAdmin = () => {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <MetricsCard title="Total Items" value={totalItems} icon={FileText} description="All remediation items" accentColor="bg-primary" />
-          <MetricsCard title="Open Items" value={openItems} icon={AlertCircle} description="Awaiting action" accentColor="bg-amber-500" />
-          <MetricsCard title="In Progress" value={inProgressItems} icon={Clock} description="Currently being worked on" accentColor="bg-primary" />
-          <MetricsCard title="Critical Open" value={criticalItems} icon={Shield} description="Requiring immediate attention" accentColor="bg-destructive" />
+          <MetricsCard title="Total Items" value={totalItems} icon={FileText} description="All remediation items" accentColor="bg-primary" onClick={() => { setStatusFilter("all"); setPriorityFilter("all"); }} />
+          <MetricsCard title="Open Items" value={openItems} icon={AlertCircle} description="Awaiting action" accentColor="bg-amber-500" onClick={() => { setStatusFilter("open"); setPriorityFilter("all"); }} />
+          <MetricsCard title="In Progress" value={inProgressItems} icon={Clock} description="Currently being worked on" accentColor="bg-primary" onClick={() => { setStatusFilter("in_progress"); setPriorityFilter("all"); }} />
+          <MetricsCard title="Critical Open" value={criticalItems} icon={Shield} description="Requiring immediate attention" accentColor="bg-destructive" onClick={() => { setPriorityFilter("critical"); setStatusFilter("all"); }} />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <MetricsCard title="Completion Rate" value={`${Math.round((closedItems / totalItems) * 100)}%`} icon={CheckCircle2} description={`${closedItems} of ${totalItems} items closed`} accentColor="bg-emerald-500" />
-          <MetricsCard title="Avg. Days to Close" value={avgDaysToClose} icon={Clock} description="Average resolution time" accentColor="bg-muted-foreground" />
+          <MetricsCard title="Completion Rate" value={`${Math.round((closedItems / totalItems) * 100)}%`} icon={CheckCircle2} description={`${closedItems} of ${totalItems} items closed`} accentColor="bg-emerald-500" onClick={() => { setStatusFilter("closed"); setPriorityFilter("all"); }} />
+          <MetricsCard title="Avg. Days to Close" value={avgDaysToClose} icon={Clock} description="Average resolution time" accentColor="bg-muted-foreground" onClick={() => { setStatusFilter("closed"); setPriorityFilter("all"); }} />
         </div>
 
         <div className="bg-card rounded-xl border p-4 shadow-sm">
