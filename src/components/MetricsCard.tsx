@@ -11,11 +11,12 @@ interface MetricsCardProps {
     isPositive: boolean;
   };
   accentColor?: string;
+  onClick?: () => void;
 }
 
-export const MetricsCard = ({ title, value, icon: Icon, description, trend, accentColor = "bg-primary" }: MetricsCardProps) => {
+export const MetricsCard = ({ title, value, icon: Icon, description, trend, accentColor = "bg-primary", onClick }: MetricsCardProps) => {
   return (
-    <Card className="relative overflow-hidden transition-all duration-200 ease-in-out hover:shadow-md">
+    <Card className={`relative overflow-hidden transition-all duration-200 ease-in-out hover:shadow-md ${onClick ? "cursor-pointer" : ""}`} onClick={onClick}>
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor}`} />
       <CardContent className="p-5 pl-6">
         <div className="flex items-center justify-between">
