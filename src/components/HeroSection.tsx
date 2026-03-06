@@ -1,4 +1,5 @@
 import { Shield, AlertTriangle, Wrench, Calendar, Activity, CheckCircle, TrendingUp, TrendingDown, type LucideIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface KPICard {
   label: string;
@@ -7,6 +8,7 @@ interface KPICard {
   borderColor: string;
   iconColor: string;
   trend: { direction: "up" | "down"; label: string };
+  href: string;
 }
 
 interface HeroSectionProps {
@@ -28,6 +30,7 @@ const HeroSection = ({
   criticalFindings,
   upcomingEvents,
 }: HeroSectionProps) => {
+  const navigate = useNavigate();
   const complianceScore = totalRemediations > 0
     ? Math.round((closedRemediations / totalRemediations) * 100)
     : 0;
@@ -40,6 +43,7 @@ const HeroSection = ({
       borderColor: "border-l-red-500",
       iconColor: "text-red-500",
       trend: { direction: openViolations > 0 ? "up" : "down", label: `${openViolations} open` },
+      href: "/violations",
     },
     {
       label: "Open Remediations",
@@ -48,6 +52,7 @@ const HeroSection = ({
       borderColor: "border-l-amber-500",
       iconColor: "text-amber-500",
       trend: { direction: openRemediations > 0 ? "up" : "down", label: `${closedRemediations} resolved` },
+      href: "/remediation",
     },
     {
       label: "Compliance Score",
@@ -56,6 +61,7 @@ const HeroSection = ({
       borderColor: "border-l-emerald-500",
       iconColor: "text-emerald-500",
       trend: { direction: complianceScore >= 50 ? "up" : "down", label: complianceScore >= 50 ? "On track" : "Needs attention" },
+      href: "/remediation",
     },
     {
       label: "Upcoming Events",
@@ -64,6 +70,7 @@ const HeroSection = ({
       borderColor: "border-l-cyan-500",
       iconColor: "text-cyan-500",
       trend: { direction: upcomingEvents > 0 ? "up" : "down", label: upcomingEvents > 0 ? `${upcomingEvents} scheduled` : "None scheduled" },
+      href: "/events",
     },
     {
       label: "Critical Findings",
@@ -72,6 +79,7 @@ const HeroSection = ({
       borderColor: "border-l-orange-500",
       iconColor: "text-orange-500",
       trend: { direction: criticalFindings > 0 ? "up" : "down", label: criticalFindings > 0 ? `${criticalFindings} need action` : "All clear" },
+      href: "/remediation",
     },
     {
       label: "Assessments Completed",
@@ -80,6 +88,7 @@ const HeroSection = ({
       borderColor: "border-l-green-500",
       iconColor: "text-green-500",
       trend: { direction: "up" as const, label: `${closedRemediations} closed` },
+      href: "/remediation",
     },
   ];
 
@@ -92,7 +101,8 @@ const HeroSection = ({
           return (
             <div
               key={card.label}
-              className={`rounded-2xl bg-card border border-border/50 border-l-4 ${card.borderColor} p-5 md:p-6 flex flex-col gap-4 card-hover animate-slide-up stagger-${Math.min(index + 1, 6)}`}
+              onClick={() => navigate(card.href)}
+              className={`cursor-pointer rounded-2xl bg-card border border-border/50 border-l-4 ${card.borderColor} p-5 md:p-6 flex flex-col gap-4 card-hover animate-slide-up stagger-${Math.min(index + 1, 6)}`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">{card.label}</span>
