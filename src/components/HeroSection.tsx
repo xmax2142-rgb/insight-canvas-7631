@@ -42,6 +42,7 @@ const HeroSection = ({
       borderColor: "border-l-red-500",
       iconColor: "text-red-500",
       trend: { direction: openViolations > 0 ? "up" : "down", label: `${openViolations} open` },
+      href: "/violations",
     },
     {
       label: "Open Remediations",
@@ -50,6 +51,7 @@ const HeroSection = ({
       borderColor: "border-l-amber-500",
       iconColor: "text-amber-500",
       trend: { direction: openRemediations > 0 ? "up" : "down", label: `${closedRemediations} resolved` },
+      href: "/remediation",
     },
     {
       label: "Compliance Score",
@@ -58,6 +60,7 @@ const HeroSection = ({
       borderColor: "border-l-emerald-500",
       iconColor: "text-emerald-500",
       trend: { direction: complianceScore >= 50 ? "up" : "down", label: complianceScore >= 50 ? "On track" : "Needs attention" },
+      href: "/remediation",
     },
     {
       label: "Upcoming Events",
@@ -66,6 +69,7 @@ const HeroSection = ({
       borderColor: "border-l-cyan-500",
       iconColor: "text-cyan-500",
       trend: { direction: upcomingEvents > 0 ? "up" : "down", label: upcomingEvents > 0 ? `${upcomingEvents} scheduled` : "None scheduled" },
+      href: "/events",
     },
     {
       label: "Critical Findings",
@@ -74,6 +78,7 @@ const HeroSection = ({
       borderColor: "border-l-orange-500",
       iconColor: "text-orange-500",
       trend: { direction: criticalFindings > 0 ? "up" : "down", label: criticalFindings > 0 ? `${criticalFindings} need action` : "All clear" },
+      href: "/remediation",
     },
     {
       label: "Assessments Completed",
@@ -82,6 +87,7 @@ const HeroSection = ({
       borderColor: "border-l-green-500",
       iconColor: "text-green-500",
       trend: { direction: "up" as const, label: `${closedRemediations} closed` },
+      href: "/remediation",
     },
   ];
 
