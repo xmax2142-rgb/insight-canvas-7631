@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import IntroSection from "@/components/IntroSection";
@@ -7,7 +8,7 @@ import { ShieldAlert, Wrench, Radar, ArrowUpRight } from "lucide-react";
 import { useViolations } from "@/hooks/useViolations";
 import { mockRemediationItems } from "@/lib/mockData";
 import { mockEvents } from "@/data/mockEvents";
-import { isAfter, startOfToday } from "date-fns";
+import { isAfter, startOfToday, isSameDay, startOfDay } from "date-fns";
 
 const hubs = [
   {
@@ -38,6 +39,7 @@ const hubs = [
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const navigate = useNavigate();
   const { violations, openCount: openViolations, totalCount: totalViolations } = useViolations();
 
   const openRemediations = mockRemediationItems.filter(i => i.status === "open" || i.status === "in_progress").length;
@@ -45,6 +47,18 @@ const Index = () => {
   const totalRemediations = mockRemediationItems.length;
   const criticalFindings = mockRemediationItems.filter(i => i.priority === "critical" && i.status !== "closed").length;
   const upcomingEvents = mockEvents.filter(ev => isAfter(ev.startDate, startOfToday()) && ev.status !== "completed").length;
+
+  const eventDates = useMemo(() => mockEvents.map(ev => startOfDay(ev.startDate)), []);
+  const eventDateModifiers = useMemo(() => ({
+    hasEvent: (day: Date) => eventDates.some(d => isSameDay(d, day)),
+  }), [eventDates]);
+
+  const handleDateSelect = (selected: Date | undefined) => {
+    setDate(selected);
+    if (selected) {
+      navigate("/events");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
@@ -96,9 +110,15 @@ const Index = () => {
             <Calendar
               mode="single"
               selected={date}
-              onSelect={setDate}
+              onSelect={handleDateSelect}
+              modifiers={{ hasEvent: eventDateModifiers.hasEvent }}
+              modifiersClassNames={{ hasEvent: "has-event" }}
               className="pointer-events-auto"
             />
+            <p className="text-xs text-muted-foreground mt-4 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary inline-block" />
+              Dates with scheduled events — click to view in Events Hub
+            </p>
           </div>
         </section>
       </main>
