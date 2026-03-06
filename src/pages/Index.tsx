@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
+import HeroSection from "@/components/HeroSection";
 import IntroSection from "@/components/IntroSection";
 import { Calendar } from "@/components/ui/calendar";
 import { ShieldAlert, Wrench, Radar, ArrowUpRight } from "lucide-react";
 import { useViolations } from "@/hooks/useViolations";
 import { mockRemediationItems } from "@/lib/mockData";
 import { mockEvents } from "@/data/mockEvents";
-import { isAfter, startOfToday } from "date-fns";
+import { isAfter, startOfToday, isSameDay, startOfDay } from "date-fns";
 
 const hubs = [
   {
