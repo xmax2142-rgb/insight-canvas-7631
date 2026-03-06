@@ -22,13 +22,7 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({
-  ...props
-}: HeroSectionProps) => {
-  const navigate = useNavigate();
-  const {
-    totalViolations, openViolations, openRemediations,
-    closedRemediations, totalRemediations, criticalFindings, upcomingEvents,
-  } = props;
+  totalViolations,
   openViolations,
   openRemediations,
   closedRemediations,
@@ -36,6 +30,7 @@ const HeroSection = ({
   criticalFindings,
   upcomingEvents,
 }: HeroSectionProps) => {
+  const navigate = useNavigate();
   const complianceScore = totalRemediations > 0
     ? Math.round((closedRemediations / totalRemediations) * 100)
     : 0;
