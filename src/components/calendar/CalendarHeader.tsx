@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { ChevronLeft, ChevronRight, ChevronDown, Plus, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Plus, Filter, X } from "lucide-react";
 import { format, setMonth, setYear } from "date-fns";
 import { CalendarViewType } from "@/types/calendar";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface CalendarHeaderProps { currentDate: Date; viewType: CalendarViewType; onDateChange: (date: Date) => void; onViewChange: (view: CalendarViewType) => void; onToday: () => void; onPrevious: () => void; onNext: () => void; onAddEvent: () => void; onToggleFilters?: () => void; }
+interface CalendarHeaderProps { currentDate: Date; viewType: CalendarViewType; onDateChange: (date: Date) => void; onViewChange: (view: CalendarViewType) => void; onToday: () => void; onPrevious: () => void; onNext: () => void; onAddEvent: () => void; onToggleFilters?: () => void; hasActiveFilters?: boolean; onClearFilters?: () => void; }
 
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const years = Array.from({ length: 10 }, (_, i) => 2024 + i);
