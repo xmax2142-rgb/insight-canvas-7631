@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 const allCategories: EventCategory[] = ["meetings", "audits", "compliance", "training"];
 const allStatuses: EventStatus[] = ["planned", "confirmed", "completed", "postponed"];
 const allPriorities: EventPriority[] = ["high", "medium", "low"];
+const defaultFilters: FilterState = { categories: allCategories, statuses: allStatuses, priorities: allPriorities, searchQuery: "" };
 
 export function CalendarPage() {
   const isMobile = useIsMobile();
