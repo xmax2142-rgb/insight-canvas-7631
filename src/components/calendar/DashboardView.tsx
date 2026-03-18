@@ -1,4 +1,4 @@
-import { CalendarEvent, EventCategory, EventStatus } from "@/types/calendar";
+import { CalendarEvent, EventCategory, EventStatus, FilterState } from "@/types/calendar";
 import { format, isToday, isTomorrow, isThisWeek, startOfDay, isBefore, addDays } from "date-fns";
 import { Calendar, Clock, CheckCircle2, AlertTriangle, TrendingUp, Users, Flame, ArrowRight, BarChart3, PieChart } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
-interface DashboardViewProps { events: CalendarEvent[]; onEventClick: (event: CalendarEvent) => void; onViewCalendar: () => void; }
+interface DashboardViewProps { events: CalendarEvent[]; onEventClick: (event: CalendarEvent) => void; onViewCalendar: () => void; onFilterAndView?: (filters: Partial<FilterState>) => void; }
 
 const categoryConfig: Record<EventCategory, { label: string; color: string; bg: string }> = {
   meetings: { label: "Meetings", color: "text-category-meetings", bg: "bg-category-meetings" },
