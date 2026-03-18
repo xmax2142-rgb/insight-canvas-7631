@@ -135,7 +135,7 @@ export function CalendarPage() {
         : (
           <div className="p-4 lg:p-6 flex-1 flex flex-col overflow-hidden">
             <GreetingHeader searchQuery={filters.searchQuery} onSearchChange={(query) => setFilters({ ...filters, searchQuery: query })} />
-            <CalendarHeader currentDate={currentDate} viewType={viewType} onDateChange={setCurrentDate} onViewChange={setViewType} onToday={handleToday} onPrevious={handlePrevious} onNext={handleNext} onAddEvent={handleAddEvent} onToggleFilters={() => setFiltersOpen(true)} />
+            <CalendarHeader currentDate={currentDate} viewType={viewType} onDateChange={setCurrentDate} onViewChange={setViewType} onToday={handleToday} onPrevious={handlePrevious} onNext={handleNext} onAddEvent={handleAddEvent} onToggleFilters={() => setFiltersOpen(true)} hasActiveFilters={hasActiveFilters} onClearFilters={handleClearFilters} />
             <div className="flex-1 min-h-0"><CalendarGrid currentDate={currentDate} viewType={viewType} events={filteredEvents} onEventClick={handleEventClick} onDayClick={handleDayClick} onEventMove={handleEventMove} /></div>
           </div>
         )}
