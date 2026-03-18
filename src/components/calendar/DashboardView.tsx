@@ -24,7 +24,7 @@ const statusConfig: Record<EventStatus, { label: string; color: string }> = {
   postponed: { label: "Postponed", color: "text-yellow-500" },
 };
 
-export function DashboardView({ events, onEventClick, onViewCalendar }: DashboardViewProps) {
+export function DashboardView({ events, onEventClick, onViewCalendar, onFilterAndView }: DashboardViewProps) {
   const now = new Date();
   const today = startOfDay(now);
   const totalEvents = events.length;
@@ -38,6 +38,14 @@ export function DashboardView({ events, onEventClick, onViewCalendar }: Dashboar
   const upcomingDeadlines = events.filter(e => { const d = startOfDay(e.startDate); return d >= today && d <= addDays(today, 7) && e.status !== "completed"; }).sort((a, b) => a.startDate.getTime() - b.startDate.getTime()).slice(0, 5);
   const completionRate = totalEvents > 0 ? Math.round((completedEvents / totalEvents) * 100) : 0;
   const getDateLabel = (date: Date) => { if (isToday(date)) return "Today"; if (isTomorrow(date)) return "Tomorrow"; return format(date, "EEE, MMM d"); };
+
+  const handleCardClick = (filters: Partial<FilterState>) => {
+    if (onFilterAndView) {
+      onFilterAndView(filters);
+    } else {
+      onViewCalendar();
+    }
+  };
 
   return (
     <div className="flex flex-col h-full p-4 lg:p-6 overflow-hidden">
