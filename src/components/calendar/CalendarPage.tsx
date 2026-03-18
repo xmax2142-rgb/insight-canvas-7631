@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 const allCategories: EventCategory[] = ["meetings", "audits", "compliance", "training"];
 const allStatuses: EventStatus[] = ["planned", "confirmed", "completed", "postponed"];
 const allPriorities: EventPriority[] = ["high", "medium", "low"];
+const defaultFilters: FilterState = { categories: allCategories, statuses: allStatuses, priorities: allPriorities, searchQuery: "" };
 
 export function CalendarPage() {
   const isMobile = useIsMobile();
@@ -126,7 +127,7 @@ export function CalendarPage() {
     <div className="flex h-screen gradient-bg">
       <aside className="hidden lg:block shrink-0"><IconSidebar activeSection={activeSection} onSectionChange={setActiveSection} /></aside>
       <main ref={mainRef} onClick={handleMainClick} className="flex-1 flex flex-col min-w-0 overflow-hidden pb-20 lg:pb-0 relative">
-        {activeSection === "dashboard" ? <DashboardView events={filteredEvents} onEventClick={handleEventClick} onViewCalendar={() => setActiveSection("calendar")} />
+        {activeSection === "dashboard" ? <DashboardView events={filteredEvents} onEventClick={handleEventClick} onViewCalendar={() => setActiveSection("calendar")} onFilterAndView={(partialFilters) => { setFilters({ ...defaultFilters, ...partialFilters, searchQuery: "" }); setActiveSection("calendar"); }} />
         : activeSection === "notes" ? <NotesView />
         : activeSection === "tasks" ? <TasksView />
         : (
