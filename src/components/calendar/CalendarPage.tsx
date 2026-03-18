@@ -41,7 +41,9 @@ export function CalendarPage() {
   const [activeSection, setActiveSection] = useState("calendar");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [scheduledPanelOpen, setScheduledPanelOpen] = useState(false);
-  const [filters, setFilters] = useState<FilterState>({ categories: allCategories, statuses: allStatuses, priorities: allPriorities, searchQuery: "" });
+  const [filters, setFilters] = useState<FilterState>(defaultFilters);
+  const hasActiveFilters = filters.categories.length !== allCategories.length || filters.statuses.length !== allStatuses.length || filters.priorities.length !== allPriorities.length || filters.searchQuery !== "";
+  const handleClearFilters = () => setFilters(defaultFilters);
   const lastClickPos = useRef<{ x: number; y: number } | null>(null);
 
   const filteredEvents = useMemo(() => {
@@ -133,7 +135,7 @@ export function CalendarPage() {
         : (
           <div className="p-4 lg:p-6 flex-1 flex flex-col overflow-hidden">
             <GreetingHeader searchQuery={filters.searchQuery} onSearchChange={(query) => setFilters({ ...filters, searchQuery: query })} />
-            <CalendarHeader currentDate={currentDate} viewType={viewType} onDateChange={setCurrentDate} onViewChange={setViewType} onToday={handleToday} onPrevious={handlePrevious} onNext={handleNext} onAddEvent={handleAddEvent} onToggleFilters={() => setFiltersOpen(true)} />
+            <CalendarHeader currentDate={currentDate} viewType={viewType} onDateChange={setCurrentDate} onViewChange={setViewType} onToday={handleToday} onPrevious={handlePrevious} onNext={handleNext} onAddEvent={handleAddEvent} onToggleFilters={() => setFiltersOpen(true)} hasActiveFilters={hasActiveFilters} onClearFilters={handleClearFilters} />
             <div className="flex-1 min-h-0"><CalendarGrid currentDate={currentDate} viewType={viewType} events={filteredEvents} onEventClick={handleEventClick} onDayClick={handleDayClick} onEventMove={handleEventMove} /></div>
           </div>
         )}
