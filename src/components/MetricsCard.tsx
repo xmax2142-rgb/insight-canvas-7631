@@ -16,7 +16,7 @@ interface MetricsCardProps {
 
 export const MetricsCard = ({ title, value, icon: Icon, description, trend, accentColor = "bg-primary", onClick }: MetricsCardProps) => {
   return (
-    <Card className={`relative overflow-hidden transition-all duration-200 ease-in-out hover:shadow-md ${onClick ? "cursor-pointer" : ""}`} onClick={onClick}>
+    <Card className={`relative overflow-hidden transition-all duration-200 ease-in-out ${onClick ? "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]" : ""}`} onClick={onClick}>
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${accentColor}`} />
       <CardContent className="p-5 pl-6">
         <div className="flex items-center justify-between">
