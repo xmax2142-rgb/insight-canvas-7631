@@ -41,7 +41,9 @@ export function CalendarPage() {
   const [activeSection, setActiveSection] = useState("calendar");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [scheduledPanelOpen, setScheduledPanelOpen] = useState(false);
-  const [filters, setFilters] = useState<FilterState>({ categories: allCategories, statuses: allStatuses, priorities: allPriorities, searchQuery: "" });
+  const [filters, setFilters] = useState<FilterState>(defaultFilters);
+  const hasActiveFilters = filters.categories.length !== allCategories.length || filters.statuses.length !== allStatuses.length || filters.priorities.length !== allPriorities.length || filters.searchQuery !== "";
+  const handleClearFilters = () => setFilters(defaultFilters);
   const lastClickPos = useRef<{ x: number; y: number } | null>(null);
 
   const filteredEvents = useMemo(() => {
