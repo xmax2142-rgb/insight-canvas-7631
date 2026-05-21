@@ -236,6 +236,7 @@ export async function executeTool(name: string, args: any, ctx: ToolContext): Pr
       return ok ? { success: true } : { success: false, error: `No violation ${args.id}` };
     }
 
+    case "navigate_to": {
       ctx.navigate(args.path);
       return { success: true, path: args.path };
     }
