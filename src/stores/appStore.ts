@@ -2,10 +2,26 @@ import { create } from "zustand";
 import { mockRemediationItems, type RemediationItem, type RemediationStatus, type RemediationPriority } from "@/lib/mockData";
 import { mockEvents } from "@/data/mockEvents";
 import type { CalendarEvent } from "@/types/calendar";
+import type { Violation, ActionTaken } from "@/types/violation";
 
 export interface Note { id: string; title: string; content: string; date: Date; createdAt: Date; }
 export type TaskPriority = "high" | "medium" | "low";
 export interface Task { id: string; title: string; completed: boolean; priority: TaskPriority; dueDate: Date | null; createdAt: Date; }
+
+const VIOLATIONS_STORAGE_KEY = "grc-violations";
+function loadViolations(): Violation[] {
+  try {
+    if (typeof window === "undefined") return [];
+    const raw = localStorage.getItem(VIOLATIONS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+function persistViolations(v: Violation[]) {
+  try { localStorage.setItem(VIOLATIONS_STORAGE_KEY, JSON.stringify(v)); } catch {}
+}
+function nextViolationNumber(v: Violation[]) {
+  return v.length === 0 ? 1 : Math.max(...v.map((x) => x.number)) + 1;
+}
 
 const initialNotes: Note[] = [
   { id: "n1", title: "Security Audit Findings", content: "Key findings from the Q1 security audit.", date: new Date(2026, 0, 15), createdAt: new Date(2026, 0, 15, 10, 30) },
