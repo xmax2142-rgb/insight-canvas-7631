@@ -20,6 +20,10 @@ const gateway = createOpenAICompatible({
 // (against the local Zustand stores) so the assistant can mutate UI state.
 const tools = {
   // ===== READ =====
+  get_page_structure: tool({
+    description: "Get the full app routing map and data model schema. Call this when the user asks how the app is organized, what pages exist, or before navigating somewhere new.",
+    inputSchema: z.object({}),
+  }),
   get_app_state: tool({
     description: "Get a compact snapshot of current data: counts and recent items across remediation, events, notes, tasks. Call this first to understand what exists.",
     inputSchema: z.object({}),
