@@ -66,7 +66,6 @@ interface AppState {
   addViolation: (data: Omit<Violation, "id" | "number" | "createdAt" | "updatedAt">) => Violation;
   updateViolation: (id: string, data: Partial<Omit<Violation, "id" | "number" | "createdAt">>) => Violation | null;
   deleteViolation: (id: string) => boolean;
-  deleteTask: (id: string) => boolean;
 }
 
 const nextRemId = (items: RemediationItem[]) => {
