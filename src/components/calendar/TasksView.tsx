@@ -10,15 +10,7 @@ import { Search, Plus, Trash2, CheckSquare, Calendar, Flame } from "lucide-react
 import { format, isPast, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-type TaskPriority = "high" | "medium" | "low";
-interface Task { id: string; title: string; completed: boolean; priority: TaskPriority; dueDate: Date | null; createdAt: Date; }
-
-const mockTasks: Task[] = [
-  { id: "1", title: "Review security audit report", completed: false, priority: "high", dueDate: new Date(2026, 0, 20), createdAt: new Date(2026, 0, 10) },
-  { id: "2", title: "Update firewall rules", completed: true, priority: "high", dueDate: new Date(2026, 0, 15), createdAt: new Date(2026, 0, 5) },
-  { id: "3", title: "Schedule compliance training", completed: false, priority: "medium", dueDate: new Date(2026, 1, 1), createdAt: new Date(2026, 0, 12) },
-];
+import { useAppStore, type TaskPriority } from "@/stores/appStore";
 
 const priorityConfig: Record<TaskPriority, { label: string; className: string }> = {
   high: { label: "High", className: "bg-priority-high/20 text-priority-high border-priority-high/30" },
@@ -28,7 +20,8 @@ const priorityConfig: Record<TaskPriority, { label: string; className: string }>
 
 export function TasksView() {
   const { toast } = useToast();
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const tasks = useAppStore((s) => s.tasks);
+  const setTasks = useAppStore((s) => s.setTasks);
   const [searchQuery, setSearchQuery] = useState("");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [filter, setFilter] = useState<"all"|"pending"|"completed">("all");
