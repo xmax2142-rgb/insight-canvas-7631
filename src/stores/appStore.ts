@@ -191,6 +191,40 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ tasks: get().tasks.filter((t) => t.id !== id) });
     return get().tasks.length < before;
   },
+
+  violations: loadViolations(),
+  addViolation: (data) => {
+    const now = new Date().toISOString();
+    const v: Violation = {
+      ...data,
+      id: crypto.randomUUID(),
+      number: nextViolationNumber(get().violations),
+      createdAt: now,
+      updatedAt: now,
+    };
+    const next = [...get().violations, v];
+    set({ violations: next });
+    persistViolations(next);
+    return v;
+  },
+  updateViolation: (id, data) => {
+    const existing = get().violations.find((v) => v.id === id);
+    if (!existing) return null;
+    const updated: Violation = { ...existing, ...data, updatedAt: new Date().toISOString() };
+    if (data.status === "closed" && !existing.closedAt) updated.closedAt = new Date().toISOString();
+    else if (data.status === "open") updated.closedAt = undefined;
+    const next = get().violations.map((v) => (v.id === id ? updated : v));
+    set({ violations: next });
+    persistViolations(next);
+    return updated;
+  },
+  deleteViolation: (id) => {
+    const before = get().violations.length;
+    const next = get().violations.filter((v) => v.id !== id);
+    set({ violations: next });
+    persistViolations(next);
+    return next.length < before;
+  },
 }));
 
 // Re-export types for convenience
