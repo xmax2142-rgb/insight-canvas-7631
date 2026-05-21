@@ -24,6 +24,13 @@ const RemediationAdmin = () => {
     if (userStr) {
       setCurrentUser(JSON.parse(userStr));
     }
+    const onAiFilter = (e: Event) => {
+      const d = (e as CustomEvent).detail as { status: string; priority: string };
+      setStatusFilter((d.status as any) ?? "all");
+      setPriorityFilter((d.priority as any) ?? "all");
+    };
+    window.addEventListener("ai:remediation-filter", onAiFilter);
+    return () => window.removeEventListener("ai:remediation-filter", onAiFilter);
   }, []);
 
   const handleLogout = () => {
