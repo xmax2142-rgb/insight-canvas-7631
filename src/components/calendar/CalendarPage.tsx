@@ -27,7 +27,8 @@ const defaultFilters: FilterState = { categories: allCategories, statuses: allSt
 export function CalendarPage() {
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
+  const events = useAppStore((s) => s.events);
+  const setEvents = useAppStore((s) => s.setEvents);
   const [currentDate, setCurrentDate] = useState(startOfToday());
   const [selectedDate, setSelectedDate] = useState(startOfToday());
   const [viewType, setViewType] = useState<CalendarViewType>("month");
