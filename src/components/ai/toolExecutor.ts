@@ -20,6 +20,11 @@ export const DESTRUCTIVE_TOOLS = new Set<ToolName>([
 
 const TOOL_LABEL: Record<ToolName, string> = {
   get_app_state: "Read app state",
+  get_page_structure: "Inspect page structure",
+  list_violations: "List violations",
+  create_violation: "Create violation",
+  update_violation: "Update violation",
+  delete_violation: "Delete violation",
   list_remediation_items: "List remediation items",
   list_events: "List events",
   list_notes: "List notes",
