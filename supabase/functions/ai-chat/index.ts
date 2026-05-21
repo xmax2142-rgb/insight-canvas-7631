@@ -20,6 +20,10 @@ const gateway = createOpenAICompatible({
 // (against the local Zustand stores) so the assistant can mutate UI state.
 const tools = {
   // ===== READ =====
+  get_page_structure: tool({
+    description: "Get the full app routing map and data model schema. Call this when the user asks how the app is organized, what pages exist, or before navigating somewhere new.",
+    inputSchema: z.object({}),
+  }),
   get_app_state: tool({
     description: "Get a compact snapshot of current data: counts and recent items across remediation, events, notes, tasks. Call this first to understand what exists.",
     inputSchema: z.object({}),
@@ -144,32 +148,75 @@ const tools = {
     inputSchema: z.object({ id: z.string() }),
   }),
 
+  // ===== VIOLATIONS =====
+  list_violations: tool({
+    description: "List cybersecurity violations, optionally filtered by status or search query.",
+    inputSchema: z.object({
+      status: z.enum(["open", "closed", "all"]).optional(),
+      search: z.string().optional(),
+    }),
+  }),
+  create_violation: tool({
+    description: "Create a new cybersecurity violation record.",
+    inputSchema: z.object({
+      name: z.string(),
+      description: z.string().default(""),
+      violatingUser: z.string(),
+      grcComments: z.string().default(""),
+      status: z.enum(["open", "closed"]).default("open"),
+      actionTaken: z.enum(["issue_violation", "issue_warning", "no_action"]).default("no_action"),
+      finalDecision: z.string().optional(),
+    }),
+  }),
+  update_violation: tool({
+    description: "Update a violation by id (uuid). Requires confirmation. Use to close violations, change action taken, or edit details.",
+    inputSchema: z.object({
+      id: z.string(),
+      name: z.string().optional(),
+      description: z.string().optional(),
+      violatingUser: z.string().optional(),
+      grcComments: z.string().optional(),
+      status: z.enum(["open", "closed"]).optional(),
+      actionTaken: z.enum(["issue_violation", "issue_warning", "no_action"]).optional(),
+      finalDecision: z.string().optional(),
+    }),
+  }),
+  delete_violation: tool({
+    description: "Delete a violation by id. Requires confirmation.",
+    inputSchema: z.object({ id: z.string() }),
+  }),
+
   // ===== NAVIGATION =====
   navigate_to: tool({
-    description: "Navigate the user to a route in the app.",
+    description: "Navigate the user to a route in the app. Call get_page_structure first if unsure which routes exist.",
     inputSchema: z.object({
       path: z.enum([
         "/", "/events", "/violations",
         "/remediation", "/remediation/admin", "/remediation/dashboard",
+        "/about", "/authors", "/contact", "/style-guide", "/privacy", "/terms",
       ]),
     }),
   }),
 };
 
-const SYSTEM_PROMPT = `You are Nova, an in-app AI assistant for the RAP (Remediation Action Plan) & Event Horizon Hub system. You help the user view, create, modify, and delete data across:
-- Remediation items (security findings workflow)
-- Calendar events
-- Notes
-- Tasks
+const SYSTEM_PROMPT = `You are Nova, an in-app AI assistant for the RAP (Remediation Action Plan) & Event Horizon Hub — a cybersecurity GRC command center. You have full access to view, create, modify, and delete data across every module:
+- Remediation items (security findings workflow at /remediation/admin)
+- Calendar events, Notes, Tasks (at /events)
+- Cybersecurity Violations (at /violations)
+
+You can also navigate the user to any page in the app.
 
 Behavior rules:
 - Be concise. Confirm understanding briefly, then act.
+- Call get_page_structure when the user asks how the app is organized or what they can do.
 - ALWAYS call get_app_state or the relevant list_* tool BEFORE updating or deleting, so you have real ids.
-- Item ids look like REM-001 for remediation; events/notes/tasks use opaque ids.
+- Remediation ids look like REM-001. Violation ids are uuids — look them up by name/number first.
 - Destructive or modifying tools (update_*, delete_*) trigger a confirmation dialog on the client — that is expected, don't ask the user twice.
 - Use ISO 8601 for dates. If the user says relative dates (e.g. "next Friday"), compute them based on today.
 - After completing an action, give a one-line summary of what changed.
 - If the user asks something outside this app's scope, say so politely.`;
+
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });

@@ -2,10 +2,26 @@ import { create } from "zustand";
 import { mockRemediationItems, type RemediationItem, type RemediationStatus, type RemediationPriority } from "@/lib/mockData";
 import { mockEvents } from "@/data/mockEvents";
 import type { CalendarEvent } from "@/types/calendar";
+import type { Violation, ActionTaken } from "@/types/violation";
 
 export interface Note { id: string; title: string; content: string; date: Date; createdAt: Date; }
 export type TaskPriority = "high" | "medium" | "low";
 export interface Task { id: string; title: string; completed: boolean; priority: TaskPriority; dueDate: Date | null; createdAt: Date; }
+
+const VIOLATIONS_STORAGE_KEY = "grc-violations";
+function loadViolations(): Violation[] {
+  try {
+    if (typeof window === "undefined") return [];
+    const raw = localStorage.getItem(VIOLATIONS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+function persistViolations(v: Violation[]) {
+  try { localStorage.setItem(VIOLATIONS_STORAGE_KEY, JSON.stringify(v)); } catch {}
+}
+function nextViolationNumber(v: Violation[]) {
+  return v.length === 0 ? 1 : Math.max(...v.map((x) => x.number)) + 1;
+}
 
 const initialNotes: Note[] = [
   { id: "n1", title: "Security Audit Findings", content: "Key findings from the Q1 security audit.", date: new Date(2026, 0, 15), createdAt: new Date(2026, 0, 15, 10, 30) },
@@ -44,6 +60,12 @@ interface AppState {
   addTask: (t: { title: string; priority?: TaskPriority; dueDate?: Date | null }) => Task;
   toggleTask: (id: string) => Task | null;
   deleteTask: (id: string) => boolean;
+
+  // Violations (persisted to localStorage)
+  violations: Violation[];
+  addViolation: (data: Omit<Violation, "id" | "number" | "createdAt" | "updatedAt">) => Violation;
+  updateViolation: (id: string, data: Partial<Omit<Violation, "id" | "number" | "createdAt">>) => Violation | null;
+  deleteViolation: (id: string) => boolean;
 }
 
 const nextRemId = (items: RemediationItem[]) => {
@@ -168,6 +190,40 @@ export const useAppStore = create<AppState>((set, get) => ({
     const before = get().tasks.length;
     set({ tasks: get().tasks.filter((t) => t.id !== id) });
     return get().tasks.length < before;
+  },
+
+  violations: loadViolations(),
+  addViolation: (data) => {
+    const now = new Date().toISOString();
+    const v: Violation = {
+      ...data,
+      id: crypto.randomUUID(),
+      number: nextViolationNumber(get().violations),
+      createdAt: now,
+      updatedAt: now,
+    };
+    const next = [...get().violations, v];
+    set({ violations: next });
+    persistViolations(next);
+    return v;
+  },
+  updateViolation: (id, data) => {
+    const existing = get().violations.find((v) => v.id === id);
+    if (!existing) return null;
+    const updated: Violation = { ...existing, ...data, updatedAt: new Date().toISOString() };
+    if (data.status === "closed" && !existing.closedAt) updated.closedAt = new Date().toISOString();
+    else if (data.status === "open") updated.closedAt = undefined;
+    const next = get().violations.map((v) => (v.id === id ? updated : v));
+    set({ violations: next });
+    persistViolations(next);
+    return updated;
+  },
+  deleteViolation: (id) => {
+    const before = get().violations.length;
+    const next = get().violations.filter((v) => v.id !== id);
+    set({ violations: next });
+    persistViolations(next);
+    return next.length < before;
   },
 }));
 

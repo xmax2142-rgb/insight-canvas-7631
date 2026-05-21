@@ -1,12 +1,13 @@
 import { useAppStore } from "@/stores/appStore";
 
 export type ToolName =
-  | "get_app_state"
-  | "list_remediation_items" | "list_events" | "list_notes" | "list_tasks"
+  | "get_app_state" | "get_page_structure"
+  | "list_remediation_items" | "list_events" | "list_notes" | "list_tasks" | "list_violations"
   | "create_remediation_item" | "update_remediation_item" | "delete_remediation_item" | "filter_remediation_table"
   | "create_event" | "update_event" | "delete_event"
   | "create_note" | "update_note" | "delete_note"
   | "create_task" | "toggle_task" | "delete_task"
+  | "create_violation" | "update_violation" | "delete_violation"
   | "navigate_to";
 
 export const DESTRUCTIVE_TOOLS = new Set<ToolName>([
@@ -14,10 +15,16 @@ export const DESTRUCTIVE_TOOLS = new Set<ToolName>([
   "update_event", "delete_event",
   "update_note", "delete_note",
   "delete_task",
+  "update_violation", "delete_violation",
 ]);
 
 const TOOL_LABEL: Record<ToolName, string> = {
   get_app_state: "Read app state",
+  get_page_structure: "Inspect page structure",
+  list_violations: "List violations",
+  create_violation: "Create violation",
+  update_violation: "Update violation",
+  delete_violation: "Delete violation",
   list_remediation_items: "List remediation items",
   list_events: "List events",
   list_notes: "List notes",
@@ -70,6 +77,41 @@ export async function executeTool(name: string, args: any, ctx: ToolContext): Pr
           total: store.tasks.length,
           pending: store.tasks.filter((t) => !t.completed).length,
           recent: store.tasks.slice(0, 5).map((t) => ({ id: t.id, title: t.title, completed: t.completed, priority: t.priority })),
+        },
+        violations: {
+          total: store.violations.length,
+          open: store.violations.filter((v) => v.status === "open").length,
+          closed: store.violations.filter((v) => v.status === "closed").length,
+          recent: store.violations.slice(-5).map((v) => ({ id: v.id, number: v.number, name: v.name, status: v.status })),
+        },
+        currentPath: typeof window !== "undefined" ? window.location.pathname : "/",
+      };
+    }
+    case "get_page_structure": {
+      return {
+        appName: "RAP & Event Horizon Hub",
+        description: "Cybersecurity GRC command center with three main hubs: Violations, Remediation, Event Horizon.",
+        routes: [
+          { path: "/", name: "Home / Articles index", purpose: "Landing page with hero, intro, and article cards" },
+          { path: "/violations", name: "Violations Hub", purpose: "GRC analyst workspace: log, edit, close, delete cybersecurity violations" },
+          { path: "/remediation", name: "Remediation Login", purpose: "Role selection (admin/analyst) entry" },
+          { path: "/remediation/admin", name: "Remediation Admin", purpose: "Admin table of remediation items with status/priority filters and CRUD" },
+          { path: "/remediation/dashboard", name: "Remediation Dashboard", purpose: "Analyst metrics dashboard for remediation items" },
+          { path: "/remediation/item/:id", name: "Remediation Item Detail", purpose: "Single remediation item with comments and attachments" },
+          { path: "/events", name: "Event Horizon (Calendar)", purpose: "Calendar dashboard with events, notes, and tasks views" },
+          { path: "/about", name: "About" },
+          { path: "/authors", name: "Authors" },
+          { path: "/contact", name: "Contact" },
+          { path: "/style-guide", name: "Style Guide" },
+          { path: "/privacy", name: "Privacy" },
+          { path: "/terms", name: "Terms" },
+        ],
+        dataModels: {
+          remediationItem: ["id (REM-###)", "title", "description", "status (open|in_progress|pending_review|closed)", "priority (critical|high|medium|low)", "assignedToName", "dueDate", "category"],
+          calendarEvent: ["id", "title", "category (meetings|audits|compliance|training)", "startDate", "endDate", "status", "priority"],
+          note: ["id", "title", "content"],
+          task: ["id", "title", "completed", "priority", "dueDate"],
+          violation: ["id (uuid)", "number", "name", "description", "violatingUser", "status (open|closed)", "actionTaken (issue_violation|issue_warning|no_action)", "finalDecision", "grcComments"],
         },
       };
     }
@@ -163,6 +205,37 @@ export async function executeTool(name: string, args: any, ctx: ToolContext): Pr
       return ok ? { success: true } : { success: false, error: `No task ${args.id}` };
     }
 
+    case "list_violations": {
+      let items = store.violations;
+      if (args.status && args.status !== "all") items = items.filter((v) => v.status === args.status);
+      if (args.search) {
+        const q = String(args.search).toLowerCase();
+        items = items.filter((v) => v.name.toLowerCase().includes(q) || v.violatingUser.toLowerCase().includes(q));
+      }
+      return items.map((v) => ({ id: v.id, number: v.number, name: v.name, violatingUser: v.violatingUser, status: v.status, actionTaken: v.actionTaken, createdAt: v.createdAt }));
+    }
+    case "create_violation": {
+      const v = store.addViolation({
+        name: args.name,
+        description: args.description ?? "",
+        violatingUser: args.violatingUser ?? "Unknown",
+        grcComments: args.grcComments ?? "",
+        status: args.status ?? "open",
+        actionTaken: args.actionTaken ?? "no_action",
+        finalDecision: args.finalDecision,
+      });
+      return { success: true, id: v.id, number: v.number };
+    }
+    case "update_violation": {
+      const { id, ...patch } = args;
+      const updated = store.updateViolation(id, patch);
+      return updated ? { success: true, id } : { success: false, error: `No violation ${id}` };
+    }
+    case "delete_violation": {
+      const ok = store.deleteViolation(args.id);
+      return ok ? { success: true } : { success: false, error: `No violation ${args.id}` };
+    }
+
     case "navigate_to": {
       ctx.navigate(args.path);
       return { success: true, path: args.path };
@@ -189,6 +262,8 @@ export function describeAction(name: string, args: any): string {
     case "update_note": return `Update note ${args.id}`;
     case "delete_note": return `Delete note ${args.id}`;
     case "delete_task": return `Delete task ${args.id}`;
+    case "update_violation": return `Update violation ${args.id}`;
+    case "delete_violation": return `Permanently delete violation ${args.id}`;
     default: return `${toolLabel(name)} with ${JSON.stringify(args)}`;
   }
 }
