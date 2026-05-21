@@ -60,6 +60,13 @@ interface AppState {
   addTask: (t: { title: string; priority?: TaskPriority; dueDate?: Date | null }) => Task;
   toggleTask: (id: string) => Task | null;
   deleteTask: (id: string) => boolean;
+
+  // Violations (persisted to localStorage)
+  violations: Violation[];
+  addViolation: (data: Omit<Violation, "id" | "number" | "createdAt" | "updatedAt">) => Violation;
+  updateViolation: (id: string, data: Partial<Omit<Violation, "id" | "number" | "createdAt">>) => Violation | null;
+  deleteViolation: (id: string) => boolean;
+  deleteTask: (id: string) => boolean;
 }
 
 const nextRemId = (items: RemediationItem[]) => {
