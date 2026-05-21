@@ -148,13 +148,52 @@ const tools = {
     inputSchema: z.object({ id: z.string() }),
   }),
 
+  // ===== VIOLATIONS =====
+  list_violations: tool({
+    description: "List cybersecurity violations, optionally filtered by status or search query.",
+    inputSchema: z.object({
+      status: z.enum(["open", "closed", "all"]).optional(),
+      search: z.string().optional(),
+    }),
+  }),
+  create_violation: tool({
+    description: "Create a new cybersecurity violation record.",
+    inputSchema: z.object({
+      name: z.string(),
+      description: z.string().default(""),
+      violatingUser: z.string(),
+      grcComments: z.string().default(""),
+      status: z.enum(["open", "closed"]).default("open"),
+      actionTaken: z.enum(["issue_violation", "issue_warning", "no_action"]).default("no_action"),
+      finalDecision: z.string().optional(),
+    }),
+  }),
+  update_violation: tool({
+    description: "Update a violation by id (uuid). Requires confirmation. Use to close violations, change action taken, or edit details.",
+    inputSchema: z.object({
+      id: z.string(),
+      name: z.string().optional(),
+      description: z.string().optional(),
+      violatingUser: z.string().optional(),
+      grcComments: z.string().optional(),
+      status: z.enum(["open", "closed"]).optional(),
+      actionTaken: z.enum(["issue_violation", "issue_warning", "no_action"]).optional(),
+      finalDecision: z.string().optional(),
+    }),
+  }),
+  delete_violation: tool({
+    description: "Delete a violation by id. Requires confirmation.",
+    inputSchema: z.object({ id: z.string() }),
+  }),
+
   // ===== NAVIGATION =====
   navigate_to: tool({
-    description: "Navigate the user to a route in the app.",
+    description: "Navigate the user to a route in the app. Call get_page_structure first if unsure which routes exist.",
     inputSchema: z.object({
       path: z.enum([
         "/", "/events", "/violations",
         "/remediation", "/remediation/admin", "/remediation/dashboard",
+        "/about", "/authors", "/contact", "/style-guide", "/privacy", "/terms",
       ]),
     }),
   }),
