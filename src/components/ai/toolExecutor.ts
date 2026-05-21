@@ -1,12 +1,13 @@
 import { useAppStore } from "@/stores/appStore";
 
 export type ToolName =
-  | "get_app_state"
-  | "list_remediation_items" | "list_events" | "list_notes" | "list_tasks"
+  | "get_app_state" | "get_page_structure"
+  | "list_remediation_items" | "list_events" | "list_notes" | "list_tasks" | "list_violations"
   | "create_remediation_item" | "update_remediation_item" | "delete_remediation_item" | "filter_remediation_table"
   | "create_event" | "update_event" | "delete_event"
   | "create_note" | "update_note" | "delete_note"
   | "create_task" | "toggle_task" | "delete_task"
+  | "create_violation" | "update_violation" | "delete_violation"
   | "navigate_to";
 
 export const DESTRUCTIVE_TOOLS = new Set<ToolName>([
@@ -14,6 +15,7 @@ export const DESTRUCTIVE_TOOLS = new Set<ToolName>([
   "update_event", "delete_event",
   "update_note", "delete_note",
   "delete_task",
+  "update_violation", "delete_violation",
 ]);
 
 const TOOL_LABEL: Record<ToolName, string> = {
