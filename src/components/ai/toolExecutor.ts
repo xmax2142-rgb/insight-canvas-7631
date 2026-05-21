@@ -262,6 +262,8 @@ export function describeAction(name: string, args: any): string {
     case "update_note": return `Update note ${args.id}`;
     case "delete_note": return `Delete note ${args.id}`;
     case "delete_task": return `Delete task ${args.id}`;
+    case "update_violation": return `Update violation ${args.id}`;
+    case "delete_violation": return `Permanently delete violation ${args.id}`;
     default: return `${toolLabel(name)} with ${JSON.stringify(args)}`;
   }
 }
