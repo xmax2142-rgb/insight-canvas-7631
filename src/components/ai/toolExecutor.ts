@@ -78,6 +78,41 @@ export async function executeTool(name: string, args: any, ctx: ToolContext): Pr
           pending: store.tasks.filter((t) => !t.completed).length,
           recent: store.tasks.slice(0, 5).map((t) => ({ id: t.id, title: t.title, completed: t.completed, priority: t.priority })),
         },
+        violations: {
+          total: store.violations.length,
+          open: store.violations.filter((v) => v.status === "open").length,
+          closed: store.violations.filter((v) => v.status === "closed").length,
+          recent: store.violations.slice(-5).map((v) => ({ id: v.id, number: v.number, name: v.name, status: v.status })),
+        },
+        currentPath: typeof window !== "undefined" ? window.location.pathname : "/",
+      };
+    }
+    case "get_page_structure": {
+      return {
+        appName: "RAP & Event Horizon Hub",
+        description: "Cybersecurity GRC command center with three main hubs: Violations, Remediation, Event Horizon.",
+        routes: [
+          { path: "/", name: "Home / Articles index", purpose: "Landing page with hero, intro, and article cards" },
+          { path: "/violations", name: "Violations Hub", purpose: "GRC analyst workspace: log, edit, close, delete cybersecurity violations" },
+          { path: "/remediation", name: "Remediation Login", purpose: "Role selection (admin/analyst) entry" },
+          { path: "/remediation/admin", name: "Remediation Admin", purpose: "Admin table of remediation items with status/priority filters and CRUD" },
+          { path: "/remediation/dashboard", name: "Remediation Dashboard", purpose: "Analyst metrics dashboard for remediation items" },
+          { path: "/remediation/item/:id", name: "Remediation Item Detail", purpose: "Single remediation item with comments and attachments" },
+          { path: "/events", name: "Event Horizon (Calendar)", purpose: "Calendar dashboard with events, notes, and tasks views" },
+          { path: "/about", name: "About" },
+          { path: "/authors", name: "Authors" },
+          { path: "/contact", name: "Contact" },
+          { path: "/style-guide", name: "Style Guide" },
+          { path: "/privacy", name: "Privacy" },
+          { path: "/terms", name: "Terms" },
+        ],
+        dataModels: {
+          remediationItem: ["id (REM-###)", "title", "description", "status (open|in_progress|pending_review|closed)", "priority (critical|high|medium|low)", "assignedToName", "dueDate", "category"],
+          calendarEvent: ["id", "title", "category (meetings|audits|compliance|training)", "startDate", "endDate", "status", "priority"],
+          note: ["id", "title", "content"],
+          task: ["id", "title", "completed", "priority", "dueDate"],
+          violation: ["id (uuid)", "number", "name", "description", "violatingUser", "status (open|closed)", "actionTaken (issue_violation|issue_warning|no_action)", "finalDecision", "grcComments"],
+        },
       };
     }
     case "list_remediation_items": {
