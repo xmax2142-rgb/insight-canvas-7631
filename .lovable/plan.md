@@ -1,80 +1,72 @@
-# Cybersecurity GRC Dashboard Homepage
+# AI Assistant Chatbot — Implementation Plan
 
-## Overview
+## Goal
+A floating AI chat widget available on every page that can read, create, update, and delete data across:
+- Remediation items (admin dashboard)
+- Calendar events
+- Notes
+- Tasks
 
-Transform the current blog/magazine homepage into a Cybersecurity GRC (Governance, Risk, Compliance) dashboard with a dark aesthetic, KPI cards, hub shortcuts, and a monthly activity calendar.
+Session-only chat with localStorage backup. Destructive actions require user confirmation.
 
-## Changes
+## Architecture
 
-### 1. Update Color Theme (src/index.css)
+### 1. Backend (Lovable Cloud)
+Enable Lovable Cloud to get `LOVABLE_API_KEY`. Create one edge function:
+- `supabase/functions/ai-chat/index.ts` — streams responses using AI SDK + Gemini 3 Flash, declares the full tool catalog (with `inputSchema` only). Tools are **not executed server-side** — the model emits tool calls and the client runs them against local app state.
 
-- keep the warm cream/beige palette as it is and do not change 
+### 2. Global App State (Zustand)
+Currently remediation items, events, notes, tasks live in component state with mock data. Lift them to lightweight Zustand stores so both the existing UI and the chatbot can read/mutate them:
+- `src/stores/remediationStore.ts`
+- `src/stores/calendarStore.ts` (wraps existing events)
+- `src/stores/notesStore.ts`
+- `src/stores/tasksStore.ts`
 
-### 2. Update Header (src/components/Header.tsx)
+Existing components refactored minimally to source data from these stores.
 
-- Replace "Perspective" branding with "CyberGRC" or similar
-- Update navigation links to: Dashboard, Violations, Remediation, Events
-- Change "Join Now" button to a profile/settings action
+### 3. Chat Widget
+- `src/components/ai/ChatWidget.tsx` — floating bottom-right button → expandable panel
+- `src/components/ai/ChatMessages.tsx` — renders `message.parts` (text + tool invocations)
+- `src/components/ai/ToolCallCard.tsx` — collapsed accordion showing tool name, args, result
+- `src/components/ai/ConfirmActionDialog.tsx` — modal for destructive ops
+- Mounted globally in `App.tsx`
 
-### 3. Replace HeroSection with KPI Dashboard (src/components/HeroSection.tsx)
+Uses `useChat` from `@ai-sdk/react` with `DefaultChatTransport` pointing at the edge function. Messages persisted to `localStorage` key `ai-chat-session`.
 
-- Remove the image-based hero entirely
-- Create a grid of 4-6 modern KPI cards with placeholder values:
-  - Total Violations (with alert icon, red indicator)
-  - Open Remediations (with wrench icon, amber indicator)  
-  - Compliance Score (with shield icon, green indicator)
-  - Upcoming Events (with calendar icon, cyan indicator)
-  - Critical Findings (with warning icon)
-  - Assessments Completed (with check icon)
-- Each card: dark card background, colored left border or icon accent, large placeholder number ("--"), label, and a subtle trend indicator
+### 4. Tool Execution Flow
+- AI SDK tool calls arrive client-side via `onToolCall`
+- Tool registry maps tool name → handler function operating on Zustand stores
+- Destructive tools (delete, close, modify) trigger `ConfirmActionDialog` before execution
+- Result returned via `addToolResult` so model can continue reasoning
 
-### 4. Replace IntroSection (src/components/IntroSection.tsx)
+### 5. Tool Catalog
+Remediation: `list_remediation_items`, `get_remediation_item`, `create_remediation_item`, `update_remediation_item`, `delete_remediation_item`, `filter_remediation_table`
+Calendar: `list_events`, `create_event`, `update_event`, `delete_event`, `move_event`
+Notes: `list_notes`, `create_note`, `update_note`, `delete_note`
+Tasks: `list_tasks`, `create_task`, `update_task`, `toggle_task`, `delete_task`
+Navigation: `navigate_to` (route the user to a page)
 
-- Brief welcome/status summary text for the cybersecurity analyst
-- Something like "GRC Command Center - Monitor violations, track remediation, and manage compliance activities"
+Confirmation required for: any `delete_*`, `update_*`, and item status changes.
 
-### 5. Replace Article Cards Section with Hub Shortcuts (src/pages/Index.tsx)
+### 6. Design
+- Floating circular button with subtle pulse, primary color
+- Expanded panel ~400×600px, rounded, shadow-2xl, glass-ish background
+- Use AI Elements primitives (`conversation`, `message`, `prompt-input`, `tool`, `shimmer`) installed via `bunx ai-elements@latest add ...`
+- Custom agent avatar (generated, not Sparkles icon)
 
-- Replace the "Featured Articles" grid with three clickable hub cards:
-  - **Cyber Violations Hub** (/violations) - Shield/alert icon, dark card with red accent
-  - **Remediation Hub** (/remediation) - Wrench/tool icon, dark card with amber accent
-  - **Event Horizon Hub** (/events) - Calendar/radar icon, dark card with cyan accent
-- Each card: thumbnail-style with icon, title, brief description, and arrow indicator
+## Order of work
+1. Enable Lovable Cloud + verify `LOVABLE_API_KEY`
+2. Install deps: `ai`, `@ai-sdk/react`, `@ai-sdk/openai-compatible`, `zustand`
+3. Install AI Elements components
+4. Create Zustand stores + refactor existing screens to consume them
+5. Edge function with tool schema declarations
+6. Chat widget UI + tool executor + confirmation dialog
+7. Mount globally, generate agent logo
+8. QA: send commands like "create a critical remediation item about XSS", "delete event X", verify confirmations and live UI updates
 
-### 6. Add Monthly Calendar Section (src/pages/Index.tsx)
+## Notes
+- Tools execute on the client because all data is client-side (mockData / component state). No DB writes.
+- If you later move data to Cloud tables, tool execution can be moved server-side.
+- The chat panel is hidden on auth/login pages.
 
-- Add a calendar widget section below the hub shortcuts (before the newsletter section)
-- Use the existing Calendar component (react-day-picker) from src/components/ui/calendar.tsx
-- Style it to match the dark dashboard aesthetic
-- Title: "Activity Calendar" with placeholder for cybersecurity events
-
-### 7. Remove/Replace Newsletter and Footer
-
-- Replace the newsletter section with the calendar widget
-- Update footer links to match GRC context (Violations, Remediation, Events, Settings, etc.)
-
-### 8. Add Placeholder Routes (src/App.tsx)
-
-- Add routes for /violations, /remediation, /events
-- Create simple placeholder pages for each
-
-## Technical Details
-
-### Files to Create
-
-- `src/pages/Violations.tsx` - placeholder page
-- `src/pages/Remediation.tsx` - placeholder page  
-- `src/pages/Events.tsx` - placeholder page
-
-### Files to Modify
-
-- `src/index.css` - dark dashboard color theme
-- `src/components/Header.tsx` - new branding and nav
-- `src/components/HeroSection.tsx` - KPI cards dashboard
-- `src/components/IntroSection.tsx` - GRC summary text
-- `src/pages/Index.tsx` - hub shortcuts, calendar section, updated footer
-- `src/App.tsx` - new routes
-
-### Icons Used (from lucide-react)
-
-Shield, AlertTriangle, Wrench, Calendar, Activity, CheckCircle, ArrowUpRight, TrendingUp, TrendingDown
+Reply "go" to build, or tell me what to adjust (scope, design direction, model).

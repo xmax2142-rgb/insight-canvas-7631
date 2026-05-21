@@ -8,17 +8,12 @@ import { Search, Plus, Trash2, FileText, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-interface Note { id: string; title: string; content: string; date: Date; createdAt: Date; }
-
-const mockNotes: Note[] = [
-  { id: "1", title: "Security Audit Findings", content: "Key findings from the Q1 security audit.", date: new Date(2026, 0, 15), createdAt: new Date(2026, 0, 15, 10, 30) },
-  { id: "2", title: "Compliance Meeting Notes", content: "Discussion about GDPR requirements.", date: new Date(2026, 0, 20), createdAt: new Date(2026, 0, 20, 14, 0) },
-];
+import { useAppStore, type Note } from "@/stores/appStore";
 
 export function NotesView() {
   const { toast } = useToast();
-  const [notes, setNotes] = useState<Note[]>(mockNotes);
+  const notes = useAppStore((s) => s.notes);
+  const setNotes = useAppStore((s) => s.setNotes);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isCreating, setIsCreating] = useState(false);

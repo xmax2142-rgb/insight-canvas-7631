@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useCallback } from "react";
 import { addMonths, subMonths, addWeeks, subWeeks, addDays, subDays, addYears, subYears, startOfToday, differenceInDays } from "date-fns";
 import { CalendarEvent, CalendarViewType, FilterState, EventCategory, EventStatus, EventPriority } from "@/types/calendar";
-import { mockEvents } from "@/data/mockEvents";
+import { useAppStore } from "@/stores/appStore";
 import { CalendarHeader } from "./CalendarHeader";
 import { CalendarGrid } from "./CalendarGrid";
 import { CalendarSidebar } from "./CalendarSidebar";
@@ -27,7 +27,8 @@ const defaultFilters: FilterState = { categories: allCategories, statuses: allSt
 export function CalendarPage() {
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
+  const events = useAppStore((s) => s.events);
+  const setEvents = useAppStore((s) => s.setEvents);
   const [currentDate, setCurrentDate] = useState(startOfToday());
   const [selectedDate, setSelectedDate] = useState(startOfToday());
   const [viewType, setViewType] = useState<CalendarViewType>("month");
