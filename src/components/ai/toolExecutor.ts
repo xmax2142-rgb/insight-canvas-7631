@@ -205,7 +205,37 @@ export async function executeTool(name: string, args: any, ctx: ToolContext): Pr
       return ok ? { success: true } : { success: false, error: `No task ${args.id}` };
     }
 
-    case "navigate_to": {
+    case "list_violations": {
+      let items = store.violations;
+      if (args.status && args.status !== "all") items = items.filter((v) => v.status === args.status);
+      if (args.search) {
+        const q = String(args.search).toLowerCase();
+        items = items.filter((v) => v.name.toLowerCase().includes(q) || v.violatingUser.toLowerCase().includes(q));
+      }
+      return items.map((v) => ({ id: v.id, number: v.number, name: v.name, violatingUser: v.violatingUser, status: v.status, actionTaken: v.actionTaken, createdAt: v.createdAt }));
+    }
+    case "create_violation": {
+      const v = store.addViolation({
+        name: args.name,
+        description: args.description ?? "",
+        violatingUser: args.violatingUser ?? "Unknown",
+        grcComments: args.grcComments ?? "",
+        status: args.status ?? "open",
+        actionTaken: args.actionTaken ?? "no_action",
+        finalDecision: args.finalDecision,
+      });
+      return { success: true, id: v.id, number: v.number };
+    }
+    case "update_violation": {
+      const { id, ...patch } = args;
+      const updated = store.updateViolation(id, patch);
+      return updated ? { success: true, id } : { success: false, error: `No violation ${id}` };
+    }
+    case "delete_violation": {
+      const ok = store.deleteViolation(args.id);
+      return ok ? { success: true } : { success: false, error: `No violation ${args.id}` };
+    }
+
       ctx.navigate(args.path);
       return { success: true, path: args.path };
     }
