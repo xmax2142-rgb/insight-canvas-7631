@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
     const result = streamText({
       model: gateway("google/gemini-3-flash-preview"),
       system: `${SYSTEM_PROMPT}\n\nToday's date is ${today}.`,
-      messages: convertToModelMessages(messages),
+      messages: await convertToModelMessages(messages),
       tools,
       stopWhen: stepCountIs(50),
     });
