@@ -216,14 +216,7 @@ Behavior rules:
 - After completing an action, give a one-line summary of what changed.
 - If the user asks something outside this app's scope, say so politely.`;
 
-Behavior rules:
-- Be concise. Confirm understanding briefly, then act.
-- ALWAYS call get_app_state or the relevant list_* tool BEFORE updating or deleting, so you have real ids.
-- Item ids look like REM-001 for remediation; events/notes/tasks use opaque ids.
-- Destructive or modifying tools (update_*, delete_*) trigger a confirmation dialog on the client — that is expected, don't ask the user twice.
-- Use ISO 8601 for dates. If the user says relative dates (e.g. "next Friday"), compute them based on today.
-- After completing an action, give a one-line summary of what changed.
-- If the user asks something outside this app's scope, say so politely.`;
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
