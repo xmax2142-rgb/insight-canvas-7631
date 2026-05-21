@@ -7,10 +7,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { MetricsCard } from "@/components/MetricsCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
-import { mockRemediationItems, RemediationStatus, RemediationPriority, User } from "@/lib/mockData";
+import { RemediationStatus, RemediationPriority, User } from "@/lib/mockData";
+import { useAppStore } from "@/stores/appStore";
 import { AlertCircle, CheckCircle2, Clock, Shield, Search, LogOut, FileText, ChevronRight, Home } from "lucide-react";
 
 const RemediationAdmin = () => {
+  const mockRemediationItems = useAppStore((s) => s.remediationItems);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
