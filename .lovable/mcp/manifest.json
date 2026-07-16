@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.2",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "cybergrc-mcp",
+      "version": "0.1.0",
+      "title": "CyberGRC Command Center"
+    },
+    "tools": [
+      {
+        "name": "get_app_info",
+        "title": "Get app info",
+        "description": "Return the CyberGRC app's name, description, hubs, routes, and data models. Use this first to understand what the app does.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_hub_link",
+        "title": "Get hub link",
+        "description": "Return the URL path for a specific hub in the CyberGRC app. Useful when guiding a user to a section.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "hub": {
+              "type": "string",
+              "enum": [
+                "violations",
+                "remediation",
+                "events",
+                "home"
+              ],
+              "description": "Which hub to link to."
+            }
+          },
+          "required": [
+            "hub"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "echo",
+        "title": "Echo",
+        "description": "Echo the input text back. Useful for verifying MCP connectivity.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Text to echo back."
+            }
+          },
+          "required": [
+            "text"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
