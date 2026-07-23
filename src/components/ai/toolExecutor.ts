@@ -1,13 +1,14 @@
 import { useAppStore } from "@/stores/appStore";
 
 export type ToolName =
-  | "get_app_state" | "get_page_structure"
+  | "get_app_state" | "get_page_structure" | "get_page_context" | "explain_item"
   | "list_remediation_items" | "list_events" | "list_notes" | "list_tasks" | "list_violations"
   | "create_remediation_item" | "update_remediation_item" | "delete_remediation_item" | "filter_remediation_table"
   | "create_event" | "update_event" | "delete_event"
   | "create_note" | "update_note" | "delete_note"
   | "create_task" | "toggle_task" | "delete_task"
   | "create_violation" | "update_violation" | "delete_violation"
+  | "scroll_to_element" | "set_page_filter"
   | "navigate_to";
 
 export const DESTRUCTIVE_TOOLS = new Set<ToolName>([
@@ -21,6 +22,8 @@ export const DESTRUCTIVE_TOOLS = new Set<ToolName>([
 const TOOL_LABEL: Record<ToolName, string> = {
   get_app_state: "Read app state",
   get_page_structure: "Inspect page structure",
+  get_page_context: "Read current page",
+  explain_item: "Look up item",
   list_violations: "List violations",
   create_violation: "Create violation",
   update_violation: "Update violation",
@@ -42,6 +45,8 @@ const TOOL_LABEL: Record<ToolName, string> = {
   create_task: "Create task",
   toggle_task: "Toggle task",
   delete_task: "Delete task",
+  scroll_to_element: "Highlight on page",
+  set_page_filter: "Apply filter",
   navigate_to: "Navigate",
 };
 
@@ -51,12 +56,106 @@ export const toolLabel = (name: string) => TOOL_LABEL[name as ToolName] ?? name;
 export function emitRemediationFilter(status: string, priority: string) {
   window.dispatchEvent(new CustomEvent("ai:remediation-filter", { detail: { status, priority } }));
 }
+export function emitCalendarFilter(detail: Record<string, string | undefined>) {
+  window.dispatchEvent(new CustomEvent("ai:calendar-filter", { detail }));
+}
+
+function pageTitle(path: string): string {
+  if (path === "/") return "Home — CyberGRC Command Center";
+  if (path === "/violations") return "Cyber Violations Hub";
+  if (path.startsWith("/remediation/admin")) return "Remediation Admin";
+  if (path.startsWith("/remediation/dashboard")) return "Remediation Dashboard";
+  if (path.startsWith("/remediation/item")) return "Remediation Item Detail";
+  if (path === "/remediation") return "Remediation Login";
+  if (path === "/events") return "Event Horizon (Calendar)";
+  return path;
+}
+
+function currentPageContext() {
+  const store = useAppStore.getState();
+  const path = typeof window !== "undefined" ? window.location.pathname : "/";
+  const base: any = {
+    path,
+    pageTitle: pageTitle(path),
+    counts: {
+      violations: { total: store.violations.length, open: store.violations.filter(v => v.status === "open").length },
+      remediation: { total: store.remediationItems.length, open: store.remediationItems.filter(i => i.status === "open" || i.status === "in_progress").length, critical: store.remediationItems.filter(i => i.priority === "critical" && i.status !== "closed").length },
+      events: { total: store.events.length, upcoming: store.events.filter(e => e.startDate >= new Date()).length },
+      tasks: { total: store.tasks.length, pending: store.tasks.filter(t => !t.completed).length },
+      notes: store.notes.length,
+    },
+  };
+  if (path === "/") {
+    base.visibleKPIs = ["Total Violations", "Open Remediations", "Compliance Score", "Upcoming Events", "Critical Findings", "Assessments Completed"];
+    base.hubs = ["/violations", "/remediation", "/events"];
+  }
+  if (path.startsWith("/remediation/admin")) {
+    base.recentItems = store.remediationItems.slice(0, 8).map(i => ({ id: i.id, title: i.title, status: i.status, priority: i.priority }));
+  }
+  if (path === "/violations") {
+    base.recentItems = store.violations.slice(-8).map(v => ({ id: v.id, number: v.number, name: v.name, status: v.status }));
+  }
+  if (path === "/events") {
+    base.upcomingEvents = store.events
+      .filter(e => e.startDate >= new Date())
+      .slice(0, 8)
+      .map(e => ({ id: e.id, title: e.title, category: e.category, startDate: e.startDate.toISOString(), status: e.status }));
+  }
+  return base;
+}
+
+function findItem(type: string, id: string) {
+  const store = useAppStore.getState();
+  const norm = String(id).trim();
+  switch (type) {
+    case "remediation": return store.remediationItems.find(i => i.id.toLowerCase() === norm.toLowerCase()) ?? null;
+    case "violation": {
+      const asNum = Number(norm);
+      return store.violations.find(v => v.id === norm || (!isNaN(asNum) && v.number === asNum) || v.name.toLowerCase() === norm.toLowerCase()) ?? null;
+    }
+    case "event": return store.events.find(e => e.id === norm || e.title.toLowerCase() === norm.toLowerCase()) ?? null;
+    case "note": return store.notes.find(n => n.id === norm || n.title.toLowerCase() === norm.toLowerCase()) ?? null;
+    case "task": return store.tasks.find(t => t.id === norm || t.title.toLowerCase() === norm.toLowerCase()) ?? null;
+  }
+  return null;
+}
+
+function serializeItem(type: string, item: any) {
+  if (!item) return null;
+  if (type === "event") return { ...item, startDate: item.startDate?.toISOString?.() ?? item.startDate, endDate: item.endDate?.toISOString?.() ?? item.endDate };
+  if (type === "task") return { ...item, dueDate: item.dueDate?.toISOString?.() ?? item.dueDate, createdAt: item.createdAt?.toISOString?.() ?? item.createdAt };
+  if (type === "note") return { ...item, date: item.date?.toISOString?.() ?? item.date, createdAt: item.createdAt?.toISOString?.() ?? item.createdAt };
+  return item;
+}
+
+function scrollAndHighlight(selector: string): boolean {
+  if (typeof document === "undefined") return false;
+  let el: Element | null = null;
+  try { el = document.querySelector(selector); } catch { return false; }
+  if (!el) {
+    // try data-item-id fallback
+    try { el = document.querySelector(`[data-item-id="${selector}"]`); } catch {}
+  }
+  if (!el) return false;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  const target = el as HTMLElement;
+  const prev = target.style.boxShadow;
+  const prevTransition = target.style.transition;
+  target.style.transition = "box-shadow 0.4s ease";
+  target.style.boxShadow = "0 0 0 3px hsl(var(--primary)), 0 0 30px hsl(var(--primary) / 0.4)";
+  setTimeout(() => {
+    target.style.boxShadow = prev;
+    setTimeout(() => { target.style.transition = prevTransition; }, 500);
+  }, 1800);
+  return true;
+}
 
 export type ToolContext = { navigate: (path: string) => void };
 
 export async function executeTool(name: string, args: any, ctx: ToolContext): Promise<any> {
   const store = useAppStore.getState();
   switch (name as ToolName) {
+    case "get_page_context": return currentPageContext();
     case "get_app_state": {
       return {
         remediation: {
@@ -92,19 +191,13 @@ export async function executeTool(name: string, args: any, ctx: ToolContext): Pr
         appName: "RAP & Event Horizon Hub",
         description: "Cybersecurity GRC command center with three main hubs: Violations, Remediation, Event Horizon.",
         routes: [
-          { path: "/", name: "Home / Articles index", purpose: "Landing page with hero, intro, and article cards" },
+          { path: "/", name: "Home / Command Center", purpose: "Landing page with KPIs, hub shortcuts, activity calendar" },
           { path: "/violations", name: "Violations Hub", purpose: "GRC analyst workspace: log, edit, close, delete cybersecurity violations" },
           { path: "/remediation", name: "Remediation Login", purpose: "Role selection (admin/analyst) entry" },
           { path: "/remediation/admin", name: "Remediation Admin", purpose: "Admin table of remediation items with status/priority filters and CRUD" },
           { path: "/remediation/dashboard", name: "Remediation Dashboard", purpose: "Analyst metrics dashboard for remediation items" },
           { path: "/remediation/item/:id", name: "Remediation Item Detail", purpose: "Single remediation item with comments and attachments" },
           { path: "/events", name: "Event Horizon (Calendar)", purpose: "Calendar dashboard with events, notes, and tasks views" },
-          { path: "/about", name: "About" },
-          { path: "/authors", name: "Authors" },
-          { path: "/contact", name: "Contact" },
-          { path: "/style-guide", name: "Style Guide" },
-          { path: "/privacy", name: "Privacy" },
-          { path: "/terms", name: "Terms" },
         ],
         dataModels: {
           remediationItem: ["id (REM-###)", "title", "description", "status (open|in_progress|pending_review|closed)", "priority (critical|high|medium|low)", "assignedToName", "dueDate", "category"],
@@ -114,6 +207,11 @@ export async function executeTool(name: string, args: any, ctx: ToolContext): Pr
           violation: ["id (uuid)", "number", "name", "description", "violatingUser", "status (open|closed)", "actionTaken (issue_violation|issue_warning|no_action)", "finalDecision", "grcComments"],
         },
       };
+    }
+    case "explain_item": {
+      const item = findItem(args.type, args.id);
+      if (!item) return { found: false, message: `No ${args.type} matching "${args.id}"` };
+      return { found: true, type: args.type, item: serializeItem(args.type, item) };
     }
     case "list_remediation_items": {
       let items = store.remediationItems;
@@ -159,6 +257,22 @@ export async function executeTool(name: string, args: any, ctx: ToolContext): Pr
       emitRemediationFilter(args.status ?? "all", args.priority ?? "all");
       ctx.navigate("/remediation/admin");
       return { success: true, applied: { status: args.status, priority: args.priority } };
+    }
+    case "set_page_filter": {
+      const path = typeof window !== "undefined" ? window.location.pathname : "/";
+      if (path.startsWith("/remediation/admin")) {
+        emitRemediationFilter(args.status ?? "all", args.priority ?? "all");
+        return { success: true, applied: { status: args.status, priority: args.priority }, target: "remediation" };
+      }
+      if (path === "/events") {
+        emitCalendarFilter(args);
+        return { success: true, applied: args, target: "calendar" };
+      }
+      return { success: false, error: `No filterable list on ${path}` };
+    }
+    case "scroll_to_element": {
+      const ok = scrollAndHighlight(args.selector);
+      return ok ? { success: true } : { success: false, error: `No element matching "${args.selector}"` };
     }
 
     case "create_event": {

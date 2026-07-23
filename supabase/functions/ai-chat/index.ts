@@ -17,16 +17,28 @@ const gateway = createOpenAICompatible({
 });
 
 // Tools are declared with input schemas only. Execution happens on the client
-// (against the local Zustand stores) so the assistant can mutate UI state.
+// (against the local Zustand stores + DOM) so the assistant can mutate UI state
+// and control what the user sees on the page.
 const tools = {
-  // ===== READ =====
+  // ===== READ / CONTEXT =====
   get_page_structure: tool({
     description: "Get the full app routing map and data model schema. Call this when the user asks how the app is organized, what pages exist, or before navigating somewhere new.",
     inputSchema: z.object({}),
   }),
-  get_app_state: tool({
-    description: "Get a compact snapshot of current data: counts and recent items across remediation, events, notes, tasks. Call this first to understand what exists.",
+  get_page_context: tool({
+    description: "Get the CURRENT page context: route, page title, visible KPIs, active filters, and route-specific state (e.g. selected event on /events, current filter on /remediation/admin). ALWAYS call this at the start of a conversation and whenever the user references what they're 'looking at', 'this', 'here', or 'on the page'.",
     inputSchema: z.object({}),
+  }),
+  get_app_state: tool({
+    description: "Get a compact snapshot of ALL data across modules: counts and recent items across remediation, events, notes, tasks, violations. Use for global questions.",
+    inputSchema: z.object({}),
+  }),
+  explain_item: tool({
+    description: "Look up a specific item and return a plain-English explanation of what it is, its status, and why it matters. Use when the user asks 'what is X', 'tell me about X', 'why is X red', etc.",
+    inputSchema: z.object({
+      type: z.enum(["remediation", "violation", "event", "note", "task"]),
+      id: z.string().describe("The item id, e.g. REM-003, a violation uuid, event id, etc. Or a number like '5' for violation #5."),
+    }),
   }),
   list_remediation_items: tool({
     description: "List remediation items, optionally filtered by status or priority.",
@@ -48,6 +60,23 @@ const tools = {
   list_tasks: tool({
     description: "List tasks, optionally filter by completion.",
     inputSchema: z.object({ completed: z.boolean().optional() }),
+  }),
+
+  // ===== UI CONTROL =====
+  scroll_to_element: tool({
+    description: "Scroll the page to a specific element and briefly highlight it with a pulse, so the user can see what you're referring to. Use after creating something or when the user asks 'show me X'.",
+    inputSchema: z.object({
+      selector: z.string().describe("CSS selector or data-item-id like [data-item-id='REM-003']"),
+    }),
+  }),
+  set_page_filter: tool({
+    description: "Apply a filter to the current page's list/table view. Works on /remediation/admin (status/priority) and /events (category/status/priority).",
+    inputSchema: z.object({
+      status: z.string().optional(),
+      priority: z.string().optional(),
+      category: z.string().optional(),
+      search: z.string().optional(),
+    }),
   }),
 
   // ===== REMEDIATION MUTATIONS =====
@@ -199,23 +228,26 @@ const tools = {
   }),
 };
 
-const SYSTEM_PROMPT = `You are Nova, an in-app AI assistant for the RAP (Remediation Action Plan) & Event Horizon Hub — a cybersecurity GRC command center. You have full access to view, create, modify, and delete data across every module:
+const SYSTEM_PROMPT = `You are Nova, a calm, sharp cybersecurity analyst co-pilot embedded in the RAP (Remediation Action Plan) & Event Horizon Hub — a cybersecurity GRC command center. You work alongside the analyst as a trusted teammate, not a chatbot.
+
+You have full access across the app:
 - Remediation items (security findings workflow at /remediation/admin)
 - Calendar events, Notes, Tasks (at /events)
 - Cybersecurity Violations (at /violations)
+- Navigation across every page, scrolling to specific elements, and applying UI filters
 
-You can also navigate the user to any page in the app.
-
-Behavior rules:
-- Always respond in plain, natural English. Do NOT use markdown formatting (no **bold**, no headings, no bullet lists, no tables, no code blocks). Write in normal sentences and short paragraphs.
-- Be concise. Confirm understanding briefly, then act.
-- Call get_page_structure when the user asks how the app is organized or what they can do.
-- ALWAYS call get_app_state or the relevant list_* tool BEFORE updating or deleting, so you have real ids.
-- Remediation ids look like REM-001. Violation ids are uuids — look them up by name/number first.
-- Destructive or modifying tools (update_*, delete_*) trigger a confirmation dialog on the client — that is expected, don't ask the user twice.
-- Use ISO 8601 for dates. If the user says relative dates (e.g. "next Friday"), compute them based on today.
-- After completing an action, give a one-line summary of what changed.
-- If the user asks something outside this app's scope, say so politely.`;
+How you behave:
+- Talk like a human colleague. Plain, natural English only — NO markdown (no **bold**, no headings, no bullet lists, no code blocks). Just sentences and short paragraphs.
+- Be concise but warm. Confirm briefly, then act.
+- ALWAYS call get_page_context at the start of a new conversation, or any time the user references "this", "here", "what I'm looking at", or the current view. Use the result to ground your reply in what's on their screen.
+- When the user asks about a specific item (e.g. "REM-003", "violation 4", "the audit next week"), call explain_item to get its full details and describe it in plain language — do NOT just dump the JSON at them.
+- After creating or updating something, offer to scroll_to_element it so the user can see the change.
+- Use set_page_filter to filter the current view when the user asks things like "show me only the critical ones" or "just the open items".
+- Before update_* or delete_*, ALWAYS look up the item first (list_* or get_app_state) so you have the real id. Remediation ids look like REM-001; violation ids are uuids.
+- Destructive tools trigger a confirmation dialog automatically — don't ask the user twice, just call the tool.
+- Use ISO 8601 for dates; compute relative dates ("next Friday") based on today.
+- After any action, give a one-line summary of what changed and suggest one natural next step.
+- If asked something outside this app's scope, say so politely.`;
 
 
 
@@ -227,7 +259,7 @@ Deno.serve(async (req) => {
     const today = new Date().toISOString();
 
     const result = streamText({
-      model: gateway("google/gemini-3-flash-preview"),
+      model: gateway("google/gemini-3.6-flash"),
       system: `${SYSTEM_PROMPT}\n\nToday's date is ${today}.`,
       messages: await convertToModelMessages(messages),
       tools,
