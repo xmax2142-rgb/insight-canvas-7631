@@ -43,7 +43,7 @@ export function ChatWidget() {
   })();
 
   const transport = useRef(new DefaultChatTransport({
-    api: `https://uswgibbqydgkmukzjunz.supabase.co/functions/v1/ai-chat`,
+    api: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`,
   })).current;
 
   const { messages, sendMessage, status, addToolResult, setMessages } = useChat({
