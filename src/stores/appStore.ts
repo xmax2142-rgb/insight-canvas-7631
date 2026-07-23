@@ -3,6 +3,8 @@ import { mockRemediationItems, type RemediationItem, type RemediationStatus, typ
 import { mockEvents } from "@/data/mockEvents";
 import type { CalendarEvent } from "@/types/calendar";
 import type { Violation, ActionTaken } from "@/types/violation";
+import type { ComplianceSystem } from "@/types/compliance";
+import { mockComplianceSystems } from "@/data/mockComplianceSystems";
 
 export interface Note { id: string; title: string; content: string; date: Date; createdAt: Date; }
 export type TaskPriority = "high" | "medium" | "low";
