@@ -58,6 +58,13 @@ const Index = () => {
   const criticalFindings = mockRemediationItems.filter(i => i.priority === "critical" && i.status !== "closed").length;
   const upcomingEvents = mockEvents.filter(ev => isAfter(ev.startDate, startOfToday()) && ev.status !== "completed").length;
 
+  const complianceSystems = useAppStore(s => s.complianceSystems);
+  const complianceScore = useMemo(() => {
+    const totalPassed = complianceSystems.reduce((sum, s) => sum + s.passedControls, 0);
+    const totalControls = complianceSystems.reduce((sum, s) => sum + s.totalControls, 0);
+    return totalControls > 0 ? Math.round((totalPassed / totalControls) * 100) : 0;
+  }, [complianceSystems]);
+
   const eventDates = useMemo(() => mockEvents.map(ev => startOfDay(ev.startDate)), []);
   const eventDateModifiers = useMemo(() => ({
     hasEvent: (day: Date) => eventDates.some(d => isSameDay(d, day)),
@@ -83,6 +90,7 @@ const Index = () => {
           totalRemediations={totalRemediations}
           criticalFindings={criticalFindings}
           upcomingEvents={upcomingEvents}
+          complianceScore={complianceScore}
         />
         <IntroSection />
 
