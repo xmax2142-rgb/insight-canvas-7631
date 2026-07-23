@@ -4,10 +4,12 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import IntroSection from "@/components/IntroSection";
 import { Calendar } from "@/components/ui/calendar";
-import { ShieldAlert, Wrench, Radar, ArrowUpRight } from "lucide-react";
+import { ShieldAlert, Wrench, Radar, ShieldCheck, ArrowUpRight } from "lucide-react";
 import { useViolations } from "@/hooks/useViolations";
 import { mockRemediationItems } from "@/lib/mockData";
 import { mockEvents } from "@/data/mockEvents";
+import { useAppStore } from "@/stores/appStore";
+import { computeScore } from "@/types/compliance";
 import { isAfter, startOfToday, isSameDay, startOfDay } from "date-fns";
 
 const hubs = [
@@ -35,6 +37,14 @@ const hubs = [
     accentColor: "border-l-cyan-500",
     iconColor: "text-cyan-500",
   },
+  {
+    title: "Compliance Hub",
+    description: "Inventory of systems in your environment with per-system compliance scores from passed controls.",
+    href: "/compliance",
+    icon: ShieldCheck,
+    accentColor: "border-l-emerald-500",
+    iconColor: "text-emerald-500",
+  },
 ];
 
 const Index = () => {
@@ -47,6 +57,13 @@ const Index = () => {
   const totalRemediations = mockRemediationItems.length;
   const criticalFindings = mockRemediationItems.filter(i => i.priority === "critical" && i.status !== "closed").length;
   const upcomingEvents = mockEvents.filter(ev => isAfter(ev.startDate, startOfToday()) && ev.status !== "completed").length;
+
+  const complianceSystems = useAppStore(s => s.complianceSystems);
+  const complianceScore = useMemo(() => {
+    const totalPassed = complianceSystems.reduce((sum, s) => sum + s.passedControls, 0);
+    const totalControls = complianceSystems.reduce((sum, s) => sum + s.totalControls, 0);
+    return totalControls > 0 ? Math.round((totalPassed / totalControls) * 100) : 0;
+  }, [complianceSystems]);
 
   const eventDates = useMemo(() => mockEvents.map(ev => startOfDay(ev.startDate)), []);
   const eventDateModifiers = useMemo(() => ({
@@ -73,6 +90,7 @@ const Index = () => {
           totalRemediations={totalRemediations}
           criticalFindings={criticalFindings}
           upcomingEvents={upcomingEvents}
+          complianceScore={complianceScore}
         />
         <IntroSection />
 
@@ -82,7 +100,7 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Command Hubs</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {hubs.map((hub, index) => {
               const Icon = hub.icon;
               return (

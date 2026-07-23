@@ -3,6 +3,8 @@ import { mockRemediationItems, type RemediationItem, type RemediationStatus, typ
 import { mockEvents } from "@/data/mockEvents";
 import type { CalendarEvent } from "@/types/calendar";
 import type { Violation, ActionTaken } from "@/types/violation";
+import type { ComplianceSystem } from "@/types/compliance";
+import { mockComplianceSystems } from "@/data/mockComplianceSystems";
 
 export interface Note { id: string; title: string; content: string; date: Date; createdAt: Date; }
 export type TaskPriority = "high" | "medium" | "low";
@@ -66,6 +68,9 @@ interface AppState {
   addViolation: (data: Omit<Violation, "id" | "number" | "createdAt" | "updatedAt">) => Violation;
   updateViolation: (id: string, data: Partial<Omit<Violation, "id" | "number" | "createdAt">>) => Violation | null;
   deleteViolation: (id: string) => boolean;
+
+  // Compliance systems (static inventory)
+  complianceSystems: ComplianceSystem[];
 }
 
 const nextRemId = (items: RemediationItem[]) => {
@@ -225,7 +230,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     persistViolations(next);
     return next.length < before;
   },
+  complianceSystems: mockComplianceSystems,
 }));
 
 // Re-export types for convenience
-export type { RemediationItem, RemediationStatus, RemediationPriority, CalendarEvent };
+export type { RemediationItem, RemediationStatus, RemediationPriority, CalendarEvent, ComplianceSystem };

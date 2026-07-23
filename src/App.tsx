@@ -21,6 +21,7 @@ import RemediationAdmin from "./pages/RemediationAdmin";
 import RemediationDashboard from "./pages/RemediationDashboard";
 import RemediationItemDetail from "./pages/RemediationItemDetail";
 import Events from "./pages/Events";
+import ComplianceHub from "./pages/ComplianceHub";
 import NotFound from "./pages/NotFound";
 import { ChatWidget } from "./components/ai/ChatWidget";
 
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/remediation/dashboard" element={<RemediationDashboard />} />
           <Route path="/remediation/item/:id" element={<RemediationItemDetail />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/compliance" element={<ComplianceHub />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

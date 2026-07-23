@@ -58,6 +58,9 @@ const Header = () => {
             <a href="/events" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
               Events
             </a>
+            <a href="/compliance" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
+              Compliance
+            </a>
           </nav>
 
           {/* Actions */}
@@ -105,6 +108,9 @@ const Header = () => {
               </a>
               <a href="/events" className="text-sm font-medium hover:text-accent transition-colors">
                 Events
+              </a>
+              <a href="/compliance" className="text-sm font-medium hover:text-accent transition-colors">
+                Compliance
               </a>
               <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full w-full gap-2">
                 <Settings className="w-4 h-4" />
