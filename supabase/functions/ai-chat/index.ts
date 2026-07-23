@@ -258,10 +258,25 @@ Deno.serve(async (req) => {
     const { messages }: { messages: UIMessage[] } = await req.json();
     const today = new Date().toISOString();
 
+    // Repair history: Gemini rejects a user turn that directly follows tool
+    // results without an intervening assistant text. If a previous streamed
+    // turn ended after tool calls with no final assistant text, inject one so
+    // the request shape stays valid.
+    const modelMessages = await convertToModelMessages(messages);
+    const repaired: typeof modelMessages = [];
+    for (let i = 0; i < modelMessages.length; i++) {
+      const msg = modelMessages[i];
+      const prev = repaired[repaired.length - 1];
+      if (msg.role === "user" && prev?.role === "tool") {
+        repaired.push({ role: "assistant", content: "OK." } as any);
+      }
+      repaired.push(msg);
+    }
+
     const result = streamText({
       model: gateway("google/gemini-3.6-flash"),
       system: `${SYSTEM_PROMPT}\n\nToday's date is ${today}.`,
-      messages: await convertToModelMessages(messages),
+      messages: repaired,
       tools,
       stopWhen: stepCountIs(50),
     });
