@@ -19,6 +19,7 @@ interface HeroSectionProps {
   totalRemediations: number;
   criticalFindings: number;
   upcomingEvents: number;
+  complianceScore: number;
 }
 
 const HeroSection = ({
@@ -29,9 +30,10 @@ const HeroSection = ({
   totalRemediations,
   criticalFindings,
   upcomingEvents,
+  complianceScore,
 }: HeroSectionProps) => {
   const navigate = useNavigate();
-  const complianceScore = totalRemediations > 0
+  const remediationProgress = totalRemediations > 0
     ? Math.round((closedRemediations / totalRemediations) * 100)
     : 0;
 
@@ -60,8 +62,8 @@ const HeroSection = ({
       icon: Shield,
       borderColor: "border-l-emerald-500",
       iconColor: "text-emerald-500",
-      trend: { direction: complianceScore >= 50 ? "up" : "down", label: complianceScore >= 50 ? "On track" : "Needs attention" },
-      href: "/remediation",
+      trend: { direction: complianceScore >= 80 ? "up" : "down", label: complianceScore >= 80 ? "On track" : "Needs attention" },
+      href: "/compliance",
     },
     {
       label: "Upcoming Events",
