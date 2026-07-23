@@ -68,6 +68,9 @@ interface AppState {
   addViolation: (data: Omit<Violation, "id" | "number" | "createdAt" | "updatedAt">) => Violation;
   updateViolation: (id: string, data: Partial<Omit<Violation, "id" | "number" | "createdAt">>) => Violation | null;
   deleteViolation: (id: string) => boolean;
+
+  // Compliance systems (static inventory)
+  complianceSystems: ComplianceSystem[];
 }
 
 const nextRemId = (items: RemediationItem[]) => {
@@ -227,7 +230,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     persistViolations(next);
     return next.length < before;
   },
+  complianceSystems: mockComplianceSystems,
 }));
 
 // Re-export types for convenience
-export type { RemediationItem, RemediationStatus, RemediationPriority, CalendarEvent };
+export type { RemediationItem, RemediationStatus, RemediationPriority, CalendarEvent, ComplianceSystem };
