@@ -12,9 +12,9 @@ export const mockComplianceSystems: ComplianceSystem[] = [
     lastAssessmentDate: "2026-06-14",
     notes: "CIS Benchmark Level 2 applied across production fleet.",
     subcategories: [
-      { id: "sub-001a", name: "Oracle Servers", passedControls: 62, totalControls: 65 },
-      { id: "sub-001b", name: "HPC Servers", passedControls: 54, totalControls: 60 },
-      { id: "sub-001c", name: "UCMG Servers", passedControls: 52, totalControls: 55 },
+      { id: "sub-001a", name: "Oracle Servers", passedControls: 62, totalControls: 65, totalAssets: 24, failedAssets: 2 },
+      { id: "sub-001b", name: "HPC Servers", passedControls: 54, totalControls: 60, totalAssets: 18, failedAssets: 3 },
+      { id: "sub-001c", name: "UCMG Servers", passedControls: 52, totalControls: 55, totalAssets: 12, failedAssets: 1 },
     ],
   },
   {
@@ -28,9 +28,9 @@ export const mockComplianceSystems: ComplianceSystem[] = [
     lastAssessmentDate: "2026-06-20",
     notes: "Patch compliance gap on 3 legacy domain controllers.",
     subcategories: [
-      { id: "sub-002a", name: "Domain Controllers", passedControls: 55, totalControls: 70 },
-      { id: "sub-002b", name: "File Servers", passedControls: 60, totalControls: 70 },
-      { id: "sub-002c", name: "Application Servers", passedControls: 57, totalControls: 70 },
+      { id: "sub-002a", name: "Domain Controllers", passedControls: 55, totalControls: 70, totalAssets: 8, failedAssets: 3 },
+      { id: "sub-002b", name: "File Servers", passedControls: 60, totalControls: 70, totalAssets: 22, failedAssets: 4 },
+      { id: "sub-002c", name: "Application Servers", passedControls: 57, totalControls: 70, totalAssets: 35, failedAssets: 6 },
     ],
   },
   {
@@ -43,8 +43,8 @@ export const mockComplianceSystems: ComplianceSystem[] = [
     passedControls: 0,
     lastAssessmentDate: "2026-07-01",
     subcategories: [
-      { id: "sub-003a", name: "Engineering Laptops", passedControls: 68, totalControls: 72 },
-      { id: "sub-003b", name: "Developer Desktops", passedControls: 63, totalControls: 68 },
+      { id: "sub-003a", name: "Engineering Laptops", passedControls: 68, totalControls: 72, totalAssets: 45, failedAssets: 2 },
+      { id: "sub-003b", name: "Developer Desktops", passedControls: 63, totalControls: 68, totalAssets: 30, failedAssets: 3 },
     ],
   },
   {
@@ -58,8 +58,8 @@ export const mockComplianceSystems: ComplianceSystem[] = [
     lastAssessmentDate: "2026-07-05",
     notes: "BitLocker enforcement rollout in progress.",
     subcategories: [
-      { id: "sub-004a", name: "Corporate Laptops", passedControls: 60, totalControls: 85 },
-      { id: "sub-004b", name: "Kiosk Workstations", passedControls: 58, totalControls: 75 },
+      { id: "sub-004a", name: "Corporate Laptops", passedControls: 60, totalControls: 85, totalAssets: 180, failedAssets: 22 },
+      { id: "sub-004b", name: "Kiosk Workstations", passedControls: 58, totalControls: 75, totalAssets: 40, failedAssets: 7 },
     ],
   },
   {
@@ -73,9 +73,9 @@ export const mockComplianceSystems: ComplianceSystem[] = [
     lastAssessmentDate: "2026-06-28",
     notes: "Firewalls, switches, and routers hardened per NIST SP 800-53.",
     subcategories: [
-      { id: "sub-005a", name: "Firewalls", passedControls: 30, totalControls: 32 },
-      { id: "sub-005b", name: "Switches", passedControls: 32, totalControls: 33 },
-      { id: "sub-005c", name: "Routers", passedControls: 26, totalControls: 30 },
+      { id: "sub-005a", name: "Firewalls", passedControls: 30, totalControls: 32, totalAssets: 12, failedAssets: 1 },
+      { id: "sub-005b", name: "Switches", passedControls: 32, totalControls: 33, totalAssets: 48, failedAssets: 2 },
+      { id: "sub-005c", name: "Routers", passedControls: 26, totalControls: 30, totalAssets: 20, failedAssets: 3 },
     ],
   },
   {
@@ -89,9 +89,9 @@ export const mockComplianceSystems: ComplianceSystem[] = [
     lastAssessmentDate: "2026-07-10",
     notes: "Encryption at rest missing on 2 analytics clusters.",
     subcategories: [
-      { id: "sub-006a", name: "PostgreSQL Clusters", passedControls: 30, totalControls: 40 },
-      { id: "sub-006b", name: "MSSQL Clusters", passedControls: 26, totalControls: 40 },
-      { id: "sub-006c", name: "Analytics Warehouses", passedControls: 23, totalControls: 40 },
+      { id: "sub-006a", name: "PostgreSQL Clusters", passedControls: 30, totalControls: 40, totalAssets: 14, failedAssets: 3 },
+      { id: "sub-006b", name: "MSSQL Clusters", passedControls: 26, totalControls: 40, totalAssets: 10, failedAssets: 4 },
+      { id: "sub-006c", name: "Analytics Warehouses", passedControls: 23, totalControls: 40, totalAssets: 6, failedAssets: 2 },
     ],
   },
 ];
