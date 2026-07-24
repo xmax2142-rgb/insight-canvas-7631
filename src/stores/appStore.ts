@@ -237,6 +237,55 @@ export const useAppStore = create<AppState>((set, get) => ({
     return next.length < before;
   },
   complianceSystems: mockComplianceSystems,
+  addComplianceSystem: (data) => {
+    const sys: ComplianceSystem = {
+      id: `sys-${Date.now()}`,
+      subcategories: [],
+      ...data,
+    };
+    set({ complianceSystems: [...get().complianceSystems, sys] });
+    return sys;
+  },
+  updateComplianceSystem: (id, patch) => {
+    const existing = get().complianceSystems.find((s) => s.id === id);
+    if (!existing) return null;
+    const updated = { ...existing, ...patch };
+    set({ complianceSystems: get().complianceSystems.map((s) => (s.id === id ? updated : s)) });
+    return updated;
+  },
+  deleteComplianceSystem: (id) => {
+    const before = get().complianceSystems.length;
+    set({ complianceSystems: get().complianceSystems.filter((s) => s.id !== id) });
+    return get().complianceSystems.length < before;
+  },
+  addSubcategory: (systemId, sub) => {
+    const existing = get().complianceSystems.find((s) => s.id === systemId);
+    if (!existing) return null;
+    const newSub: Subcategory = { id: `sub-${Date.now()}`, ...sub };
+    const updated = { ...existing, subcategories: [...existing.subcategories, newSub] };
+    set({ complianceSystems: get().complianceSystems.map((s) => (s.id === systemId ? updated : s)) });
+    return newSub;
+  },
+  updateSubcategory: (systemId, subId, patch) => {
+    const existing = get().complianceSystems.find((s) => s.id === systemId);
+    if (!existing) return null;
+    const sub = existing.subcategories.find((x) => x.id === subId);
+    if (!sub) return null;
+    const updatedSub = { ...sub, ...patch };
+    const updated = {
+      ...existing,
+      subcategories: existing.subcategories.map((x) => (x.id === subId ? updatedSub : x)),
+    };
+    set({ complianceSystems: get().complianceSystems.map((s) => (s.id === systemId ? updated : s)) });
+    return updatedSub;
+  },
+  deleteSubcategory: (systemId, subId) => {
+    const existing = get().complianceSystems.find((s) => s.id === systemId);
+    if (!existing) return false;
+    const updated = { ...existing, subcategories: existing.subcategories.filter((x) => x.id !== subId) };
+    set({ complianceSystems: get().complianceSystems.map((s) => (s.id === systemId ? updated : s)) });
+    return updated.subcategories.length < existing.subcategories.length;
+  },
 }));
 
 // Re-export types for convenience
