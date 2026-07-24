@@ -81,7 +81,6 @@ export function SubcategoryDialog({ open, onOpenChange, initial, onSave, title }
             <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
           </div>
         </div>
-        </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button onClick={submit}>Save</Button>
