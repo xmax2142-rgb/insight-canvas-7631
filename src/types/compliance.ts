@@ -13,6 +13,8 @@ export interface Subcategory {
   name: string;
   passedControls: number;
   totalControls: number;
+  totalAssets: number;
+  failedAssets: number;
   notes?: string;
 }
 

@@ -18,6 +18,8 @@ export function SubcategoryDialog({ open, onOpenChange, initial, onSave, title }
   const [name, setName] = useState("");
   const [passed, setPassed] = useState(0);
   const [total, setTotal] = useState(0);
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [failedAssets, setFailedAssets] = useState(0);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -25,13 +27,23 @@ export function SubcategoryDialog({ open, onOpenChange, initial, onSave, title }
       setName(initial?.name ?? "");
       setPassed(initial?.passedControls ?? 0);
       setTotal(initial?.totalControls ?? 0);
+      setTotalAssets(initial?.totalAssets ?? 0);
+      setFailedAssets(initial?.failedAssets ?? 0);
       setNotes(initial?.notes ?? "");
     }
   }, [open, initial]);
 
   const submit = () => {
     if (!name.trim() || total < 0 || passed < 0 || passed > total) return;
-    onSave({ name: name.trim(), passedControls: passed, totalControls: total, notes: notes.trim() || undefined });
+    if (totalAssets < 0 || failedAssets < 0 || failedAssets > totalAssets) return;
+    onSave({
+      name: name.trim(),
+      passedControls: passed,
+      totalControls: total,
+      totalAssets,
+      failedAssets,
+      notes: notes.trim() || undefined,
+    });
     onOpenChange(false);
   };
 
@@ -54,6 +66,14 @@ export function SubcategoryDialog({ open, onOpenChange, initial, onSave, title }
             <div className="space-y-2">
               <Label>Total Controls</Label>
               <Input type="number" min={0} value={total} onChange={(e) => setTotal(parseInt(e.target.value) || 0)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Total Assets</Label>
+              <Input type="number" min={0} value={totalAssets} onChange={(e) => setTotalAssets(parseInt(e.target.value) || 0)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Failed Assets</Label>
+              <Input type="number" min={0} value={failedAssets} onChange={(e) => setFailedAssets(parseInt(e.target.value) || 0)} />
             </div>
           </div>
           <div className="space-y-2">

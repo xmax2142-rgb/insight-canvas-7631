@@ -348,7 +348,15 @@ const ComplianceHub = () => {
                                 <div className={`h-full ${subStyle.bar}`} style={{ width: `${subScore}%` }} />
                               </div>
                               <div className="text-[10px] text-muted-foreground mt-1">
-                                {sub.passedControls} / {sub.totalControls} controls
+                                <div className="flex items-center justify-between gap-2">
+                                  <span>{sub.passedControls} / {sub.totalControls} controls</span>
+                                  <span className="flex items-center gap-2">
+                                    <span>Assets: <span className="text-foreground font-medium tabular-nums">{sub.totalAssets}</span></span>
+                                    <span className={sub.failedAssets > 0 ? "text-red-600 font-medium" : ""}>
+                                      Failed: <span className="tabular-nums">{sub.failedAssets}</span>
+                                    </span>
+                                  </span>
+                                </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-0.5 shrink-0">
