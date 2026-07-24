@@ -9,21 +9,46 @@ import {
   Monitor,
   LayoutGrid,
   RefreshCcw,
+  Plus,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  ChevronDown,
+  ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useAppStore } from "@/stores/appStore";
 import {
   SYSTEM_TYPE_LABELS,
   computeScore,
   computeStatus,
+  rollupControls,
   type ComplianceStatus,
-  type ComplianceSystem,
   type SystemType,
+  type Subcategory,
+  type ComplianceSystem,
 } from "@/types/compliance";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { SubcategoryDialog } from "@/components/compliance/SubcategoryDialog";
+import { CategoryDialog } from "@/components/compliance/CategoryDialog";
 
 const typeIcons: Record<SystemType, LucideIcon> = {
   "linux-server": Server,
@@ -55,24 +80,49 @@ const statusStyles: Record<ComplianceStatus, { label: string; badge: string; bar
   },
 };
 
+type DeleteTarget =
+  | { kind: "category"; systemId: string; label: string }
+  | { kind: "subcategory"; systemId: string; subId: string; label: string }
+  | null;
+
 const ComplianceHub = () => {
   const systems = useAppStore((s) => s.complianceSystems);
+  const addComplianceSystem = useAppStore((s) => s.addComplianceSystem);
+  const updateComplianceSystem = useAppStore((s) => s.updateComplianceSystem);
+  const deleteComplianceSystem = useAppStore((s) => s.deleteComplianceSystem);
+  const addSubcategory = useAppStore((s) => s.addSubcategory);
+  const updateSubcategory = useAppStore((s) => s.updateSubcategory);
+  const deleteSubcategory = useAppStore((s) => s.deleteSubcategory);
+
   const { toast } = useToast();
   const [filter, setFilter] = useState<"all" | ComplianceStatus>("all");
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const [categoryDialog, setCategoryDialog] = useState<{ open: boolean; editing: ComplianceSystem | null }>({
+    open: false,
+    editing: null,
+  });
+  const [subDialog, setSubDialog] = useState<{ open: boolean; systemId: string | null; editing: Subcategory | null }>({
+    open: false,
+    systemId: null,
+    editing: null,
+  });
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget>(null);
 
   const enriched = useMemo(
     () =>
       systems.map((s) => {
+        const { passed, total } = rollupControls(s);
         const score = computeScore(s);
-        return { ...s, score, status: computeStatus(score) };
+        return { ...s, rolledPassed: passed, rolledTotal: total, score, status: computeStatus(score) };
       }),
     [systems],
   );
 
   const overallScore = useMemo(() => {
     if (!enriched.length) return 0;
-    const totalPassed = enriched.reduce((sum, s) => sum + s.passedControls, 0);
-    const totalControls = enriched.reduce((sum, s) => sum + s.totalControls, 0);
+    const totalPassed = enriched.reduce((sum, s) => sum + s.rolledPassed, 0);
+    const totalControls = enriched.reduce((sum, s) => sum + s.rolledTotal, 0);
     return totalControls > 0 ? Math.round((totalPassed / totalControls) * 100) : 0;
   }, [enriched]);
 
@@ -93,6 +143,18 @@ const ComplianceHub = () => {
     { label: "At Risk Systems", value: counts.atRisk, icon: ShieldCheck, accent: "border-l-amber-500", iconColor: "text-amber-500", filter: "at-risk" as const },
     { label: "Non-Compliant Systems", value: counts.nonCompliant, icon: ShieldCheck, accent: "border-l-red-500", iconColor: "text-red-500", filter: "non-compliant" as const },
   ];
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    if (deleteTarget.kind === "category") {
+      deleteComplianceSystem(deleteTarget.systemId);
+      toast({ title: "Category deleted", description: deleteTarget.label });
+    } else {
+      deleteSubcategory(deleteTarget.systemId, deleteTarget.subId);
+      toast({ title: "Subcategory deleted", description: deleteTarget.label });
+    }
+    setDeleteTarget(null);
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -120,6 +182,14 @@ const ComplianceHub = () => {
                 <Home className="h-4 w-4" /> Home
               </Button>
             </Link>
+            <Button
+              variant="outline"
+              onClick={() => setCategoryDialog({ open: true, editing: null })}
+              className="gap-2 rounded-xl"
+            >
+              <Plus className="h-4 w-4" />
+              Add Category
+            </Button>
             <Button
               onClick={() => toast({ title: "Assessment queued", description: "A control assessment run has been scheduled." })}
               className="gap-2 rounded-xl"
@@ -162,34 +232,55 @@ const ComplianceHub = () => {
         </div>
 
         {/* System cards */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {visible.map((s, i) => {
             const Icon = typeIcons[s.type] ?? LayoutGrid;
             const style = statusStyles[s.status];
+            const isOpen = expanded[s.id] ?? true;
             return (
               <div
                 key={s.id}
                 className={`rounded-2xl bg-card border border-border/50 border-l-4 ${style.border} p-6 flex flex-col gap-4 card-hover animate-slide-up stagger-${Math.min(i + 1, 6)}`}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-muted/60 flex items-center justify-center">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-muted/60 flex items-center justify-center shrink-0">
                       <Icon className="w-5 h-5 text-foreground" />
                     </div>
-                    <div>
-                      <h3 className="font-bold text-base leading-tight">{s.name}</h3>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-base leading-tight truncate">{s.name}</h3>
                       <p className="text-xs text-muted-foreground">{SYSTEM_TYPE_LABELS[s.type]}</p>
                     </div>
                   </div>
-                  <span className={`text-[10px] font-semibold px-2 py-1 rounded-full ${style.badge}`}>
-                    {style.label}
-                  </span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <span className={`text-[10px] font-semibold px-2 py-1 rounded-full ${style.badge}`}>
+                      {style.label}
+                    </span>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setCategoryDialog({ open: true, editing: s })}>
+                          <Pencil className="h-4 w-4 mr-2" /> Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-red-600 focus:text-red-600"
+                          onClick={() => setDeleteTarget({ kind: "category", systemId: s.id, label: s.name })}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
 
                 <div className="flex items-end justify-between">
                   <div className="text-4xl font-bold tracking-tight">{s.score}%</div>
                   <div className="text-xs text-muted-foreground text-right">
-                    <div className="font-medium text-foreground">{s.passedControls} / {s.totalControls}</div>
+                    <div className="font-medium text-foreground">{s.rolledPassed} / {s.rolledTotal}</div>
                     <div>controls passed</div>
                   </div>
                 </div>
@@ -221,6 +312,84 @@ const ComplianceHub = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Subcategories */}
+                <div className="pt-2 border-t border-border/50">
+                  <button
+                    onClick={() => setExpanded((prev) => ({ ...prev, [s.id]: !isOpen }))}
+                    className="flex items-center justify-between w-full text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <span className="flex items-center gap-1">
+                      {isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                      Subcategories ({s.subcategories.length})
+                    </span>
+                  </button>
+
+                  {isOpen && (
+                    <div className="mt-3 space-y-2">
+                      {s.subcategories.length === 0 && (
+                        <div className="text-xs text-muted-foreground italic py-2">No subcategories yet.</div>
+                      )}
+                      {s.subcategories.map((sub) => {
+                        const subScore = sub.totalControls > 0 ? Math.round((sub.passedControls / sub.totalControls) * 100) : 0;
+                        const subStatus = computeStatus(subScore);
+                        const subStyle = statusStyles[subStatus];
+                        return (
+                          <div
+                            key={sub.id}
+                            className="rounded-lg bg-muted/40 border border-border/40 px-3 py-2.5 flex items-center gap-3"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-sm font-medium truncate">{sub.name}</span>
+                                <span className="text-xs font-semibold tabular-nums">{subScore}%</span>
+                              </div>
+                              <div className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                                <div className={`h-full ${subStyle.bar}`} style={{ width: `${subScore}%` }} />
+                              </div>
+                              <div className="text-[10px] text-muted-foreground mt-1">
+                                {sub.passedControls} / {sub.totalControls} controls
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-0.5 shrink-0">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => setSubDialog({ open: true, systemId: s.id, editing: sub })}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-red-600 hover:text-red-700"
+                                onClick={() =>
+                                  setDeleteTarget({
+                                    kind: "subcategory",
+                                    systemId: s.id,
+                                    subId: sub.id,
+                                    label: sub.name,
+                                  })
+                                }
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-1.5 mt-2"
+                        onClick={() => setSubDialog({ open: true, systemId: s.id, editing: null })}
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Add Subcategory
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -242,6 +411,62 @@ const ComplianceHub = () => {
           </div>
         </div>
       </footer>
+
+      <CategoryDialog
+        open={categoryDialog.open}
+        onOpenChange={(v) => setCategoryDialog((prev) => ({ ...prev, open: v }))}
+        initial={categoryDialog.editing}
+        onSave={(data) => {
+          if (categoryDialog.editing) {
+            updateComplianceSystem(categoryDialog.editing.id, data);
+            toast({ title: "Category updated", description: data.name });
+          } else {
+            addComplianceSystem({
+              ...data,
+              passedControls: 0,
+              totalControls: 0,
+              lastAssessmentDate: new Date().toISOString().slice(0, 10),
+            });
+            toast({ title: "Category added", description: data.name });
+          }
+        }}
+      />
+
+      <SubcategoryDialog
+        open={subDialog.open}
+        onOpenChange={(v) => setSubDialog((prev) => ({ ...prev, open: v }))}
+        initial={subDialog.editing}
+        onSave={(data) => {
+          if (!subDialog.systemId) return;
+          if (subDialog.editing) {
+            updateSubcategory(subDialog.systemId, subDialog.editing.id, data);
+            toast({ title: "Subcategory updated", description: data.name });
+          } else {
+            addSubcategory(subDialog.systemId, data);
+            toast({ title: "Subcategory added", description: data.name });
+          }
+        }}
+      />
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(v) => !v && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Delete {deleteTarget?.kind === "category" ? "category" : "subcategory"}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove <span className="font-semibold">{deleteTarget?.label}</span>
+              {deleteTarget?.kind === "category" ? " and all its subcategories" : ""}. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

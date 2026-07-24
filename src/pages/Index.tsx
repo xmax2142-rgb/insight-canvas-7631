@@ -9,7 +9,7 @@ import { useViolations } from "@/hooks/useViolations";
 import { mockRemediationItems } from "@/lib/mockData";
 import { mockEvents } from "@/data/mockEvents";
 import { useAppStore } from "@/stores/appStore";
-import { computeScore } from "@/types/compliance";
+import { rollupControls } from "@/types/compliance";
 import { isAfter, startOfToday, isSameDay, startOfDay } from "date-fns";
 
 const hubs = [
@@ -60,9 +60,14 @@ const Index = () => {
 
   const complianceSystems = useAppStore(s => s.complianceSystems);
   const complianceScore = useMemo(() => {
-    const totalPassed = complianceSystems.reduce((sum, s) => sum + s.passedControls, 0);
-    const totalControls = complianceSystems.reduce((sum, s) => sum + s.totalControls, 0);
-    return totalControls > 0 ? Math.round((totalPassed / totalControls) * 100) : 0;
+    const totals = complianceSystems.reduce(
+      (acc, s) => {
+        const r = rollupControls(s);
+        return { passed: acc.passed + r.passed, total: acc.total + r.total };
+      },
+      { passed: 0, total: 0 },
+    );
+    return totals.total > 0 ? Math.round((totals.passed / totals.total) * 100) : 0;
   }, [complianceSystems]);
 
   const eventDates = useMemo(() => mockEvents.map(ev => startOfDay(ev.startDate)), []);
