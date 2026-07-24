@@ -9,7 +9,7 @@ import { useViolations } from "@/hooks/useViolations";
 import { mockRemediationItems } from "@/lib/mockData";
 import { mockEvents } from "@/data/mockEvents";
 import { useAppStore } from "@/stores/appStore";
-import { computeScore } from "@/types/compliance";
+import { rollupControls } from "@/types/compliance";
 import { isAfter, startOfToday, isSameDay, startOfDay } from "date-fns";
 
 const hubs = [
