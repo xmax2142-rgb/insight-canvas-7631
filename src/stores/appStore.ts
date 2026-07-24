@@ -69,8 +69,14 @@ interface AppState {
   updateViolation: (id: string, data: Partial<Omit<Violation, "id" | "number" | "createdAt">>) => Violation | null;
   deleteViolation: (id: string) => boolean;
 
-  // Compliance systems (static inventory)
+  // Compliance systems
   complianceSystems: ComplianceSystem[];
+  addComplianceSystem: (data: Omit<ComplianceSystem, "id" | "subcategories"> & { subcategories?: Subcategory[] }) => ComplianceSystem;
+  updateComplianceSystem: (id: string, patch: Partial<Omit<ComplianceSystem, "id">>) => ComplianceSystem | null;
+  deleteComplianceSystem: (id: string) => boolean;
+  addSubcategory: (systemId: string, sub: Omit<Subcategory, "id">) => Subcategory | null;
+  updateSubcategory: (systemId: string, subId: string, patch: Partial<Omit<Subcategory, "id">>) => Subcategory | null;
+  deleteSubcategory: (systemId: string, subId: string) => boolean;
 }
 
 const nextRemId = (items: RemediationItem[]) => {
