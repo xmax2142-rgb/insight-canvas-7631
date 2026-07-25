@@ -269,6 +269,30 @@ All colors MUST be HSL.
     animation: slideInRight 0.3s ease-out;
   }
 
+  @keyframes floatA {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-12px, -18px) scale(1.03); }
+  }
+  @keyframes floatB {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(16px, -14px) scale(1.05); }
+  }
+  @keyframes floatC {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(10px, 20px) scale(0.97); }
+  }
+
+  .animate-float-slow {
+    animation: floatA 9s ease-in-out infinite;
+  }
+  .animate-float-slower {
+    animation: floatB 13s ease-in-out infinite;
+  }
+  .animate-float-slowest {
+    animation: floatC 17s ease-in-out infinite;
+  }
+
+
   .tag-financing {
     @apply bg-[hsl(var(--tag-financing))] text-primary;
   }
