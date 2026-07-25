@@ -26,45 +26,47 @@ const RemediationLogin = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left branded panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden flex-col justify-between p-12 text-primary-foreground">
+      <div className="hidden lg:flex lg:w-1/2 bg-card border-r border-border relative overflow-hidden flex-col justify-between p-12 text-foreground">
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
-            <Shield className="h-10 w-10" />
-            <span className="text-2xl font-bold tracking-tight">RAP System</span>
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+              <Shield className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <span className="text-2xl font-bold tracking-tight font-serif">RAP System</span>
           </div>
-          <p className="text-primary-foreground/70 text-sm">Remediation Action Plan</p>
+          <p className="text-muted-foreground text-sm">Remediation Action Plan</p>
         </div>
 
         <div className="relative z-10 space-y-8">
-          <h2 className="text-4xl font-bold leading-tight">
+          <h2 className="text-4xl font-bold leading-tight font-serif">
             Governance, Risk<br />& Compliance<br />Management
           </h2>
-          <p className="text-primary-foreground/80 text-lg max-w-md leading-relaxed">
+          <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
             Track, manage, and resolve security findings with a streamlined remediation workflow.
           </p>
           <div className="space-y-4">
-            <div className="flex items-center gap-3 text-primary-foreground/80">
-              <ShieldCheck className="h-5 w-5 flex-shrink-0" />
+            <div className="flex items-center gap-3 text-foreground/80">
+              <ShieldCheck className="h-5 w-5 flex-shrink-0 text-accent" />
               <span>Centralized finding management</span>
             </div>
-            <div className="flex items-center gap-3 text-primary-foreground/80">
-              <UserCheck className="h-5 w-5 flex-shrink-0" />
+            <div className="flex items-center gap-3 text-foreground/80">
+              <UserCheck className="h-5 w-5 flex-shrink-0 text-accent" />
               <span>Role-based access control</span>
             </div>
-            <div className="flex items-center gap-3 text-primary-foreground/80">
-              <Lock className="h-5 w-5 flex-shrink-0" />
+            <div className="flex items-center gap-3 text-foreground/80">
+              <Lock className="h-5 w-5 flex-shrink-0 text-accent" />
               <span>Audit-ready compliance tracking</span>
             </div>
           </div>
         </div>
 
-        <p className="relative z-10 text-xs text-primary-foreground/50">© 2026 GRC System. Upstream Digital Center.</p>
+        <p className="relative z-10 text-xs text-muted-foreground">© 2026 GRC System. Upstream Digital Center.</p>
 
         {/* Decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 right-20 w-64 h-64 rounded-full border-2 border-primary-foreground" />
-          <div className="absolute bottom-32 right-32 w-96 h-96 rounded-full border border-primary-foreground" />
-          <div className="absolute top-1/2 -left-20 w-80 h-80 rounded-full border border-primary-foreground" />
+        <div className="absolute inset-0 opacity-[0.08]">
+          <div className="absolute top-20 right-20 w-64 h-64 rounded-full border-2 border-foreground" />
+          <div className="absolute bottom-32 right-32 w-96 h-96 rounded-full border border-foreground" />
+          <div className="absolute top-1/2 -left-20 w-80 h-80 rounded-full border border-foreground" />
         </div>
       </div>
 
