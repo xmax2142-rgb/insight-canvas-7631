@@ -44,9 +44,10 @@ export interface User {
 
 // Mock users
 export const mockUsers: User[] = [
-  { id: '1', name: 'Saeed', email: 'saeed@company.com', role: 'admin' },
-  { id: '2', name: 'Isa Sunat', email: 'isa.sunat@company.com', role: 'admin' },
-  { id: '3', name: 'Mohammed Kahtani', email: 'mohammed.kahtani@company.com', role: 'proponent' },
+  { id: '1', name: 'Ghamdi, Saeed M', email: 'saeed.ghamdi@company.com', role: 'admin' },
+  { id: '2', name: 'Almuhaidib, Muneera M', email: 'muneera.almuhaidib@company.com', role: 'admin' },
+  { id: '3', name: 'Shareef, Reem F', email: 'reem.shareef@company.com', role: 'admin' },
+  { id: '4', name: 'Mohammad Qhatani', email: 'mohammad.qhatani@company.com', role: 'proponent' },
 ];
 
 // Mock remediation items
