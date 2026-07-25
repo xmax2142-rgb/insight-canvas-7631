@@ -63,10 +63,10 @@ const RemediationLogin = () => {
         <p className="relative z-10 text-xs text-muted-foreground">© 2026 GRC System. Upstream Digital Center.</p>
 
         {/* Decorative elements */}
-        <div className="absolute inset-0 opacity-[0.08]">
-          <div className="absolute top-20 right-20 w-64 h-64 rounded-full border-2 border-foreground" />
-          <div className="absolute bottom-32 right-32 w-96 h-96 rounded-full border border-foreground" />
-          <div className="absolute top-1/2 -left-20 w-80 h-80 rounded-full border border-foreground" />
+        <div className="absolute inset-0 opacity-[0.08] pointer-events-none">
+          <div className="absolute top-20 right-20 w-64 h-64 rounded-full border-2 border-foreground animate-float-slow" />
+          <div className="absolute bottom-32 right-32 w-96 h-96 rounded-full border border-foreground animate-float-slower" />
+          <div className="absolute top-1/2 -left-20 w-80 h-80 rounded-full border border-foreground animate-float-slowest" />
         </div>
       </div>
 
