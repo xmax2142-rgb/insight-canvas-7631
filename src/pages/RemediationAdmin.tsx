@@ -7,17 +7,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { MetricsCard } from "@/components/MetricsCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PriorityBadge } from "@/components/PriorityBadge";
-import { RemediationStatus, RemediationPriority, User } from "@/lib/mockData";
+import { RemediationStatus, RemediationPriority, User, mockUsers } from "@/lib/mockData";
 import { useAppStore } from "@/stores/appStore";
-import { AlertCircle, CheckCircle2, Clock, Shield, Search, LogOut, FileText, ChevronRight, Home } from "lucide-react";
+import { RemediationDialog, type RemediationFormValues } from "@/components/RemediationDialog";
+import { toast } from "sonner";
+import { AlertCircle, CheckCircle2, Clock, Shield, Search, LogOut, FileText, ChevronRight, Home, Plus } from "lucide-react";
 
 const RemediationAdmin = () => {
   const mockRemediationItems = useAppStore((s) => s.remediationItems);
+  const addRemediationItem = useAppStore((s) => s.addRemediationItem);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<RemediationStatus | "all">("all");
   const [priorityFilter, setPriorityFilter] = useState<RemediationPriority | "all">("all");
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+
 
   useEffect(() => {
     const userStr = localStorage.getItem('mockUser');
@@ -37,6 +43,26 @@ const RemediationAdmin = () => {
     localStorage.removeItem('mockUser');
     navigate('/remediation');
   };
+
+  const handleCreate = (data: RemediationFormValues) => {
+    const assignee = mockUsers.find((u) => u.id === data.assignedTo);
+    const item = addRemediationItem({
+      title: data.title,
+      description: data.description,
+      category: data.category || "General",
+      priority: data.priority,
+      status: data.status,
+      assignedTo: data.assignedTo,
+      assignedToName: assignee?.name ?? "Unassigned",
+      dueDate: data.dueDate,
+      affectedSystems: data.affectedSystems
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    });
+    toast.success(`Remediation item ${item.id} created`);
+  };
+
 
   const totalItems = mockRemediationItems.length;
   const openItems = mockRemediationItems.filter(item => item.status === 'open').length;
@@ -102,14 +128,22 @@ const RemediationAdmin = () => {
       </header>
 
       <main className="container mx-auto px-6 py-8 space-y-8">
-        <div className="space-y-1">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>Dashboard</span>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-foreground">Remediation Overview</span>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span>Dashboard</span>
+              <ChevronRight className="h-3 w-3" />
+              <span className="text-foreground">Remediation Overview</span>
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight">Remediation Action Plans</h2>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">Remediation Action Plans</h2>
+          {currentUser?.role === "admin" && (
+            <Button onClick={() => setDialogOpen(true)} className="gap-2 transition-all duration-150 active:scale-[0.97]">
+              <Plus className="h-4 w-4" /> New Item
+            </Button>
+          )}
         </div>
+
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <MetricsCard title="Total Items" value={totalItems} icon={FileText} description="All remediation items" accentColor="bg-primary" onClick={() => { setStatusFilter("all"); setPriorityFilter("all"); }} />
@@ -212,7 +246,10 @@ const RemediationAdmin = () => {
           )}
         </div>
       </main>
+
+      <RemediationDialog open={dialogOpen} onOpenChange={setDialogOpen} onSubmit={handleCreate} />
     </div>
+
   );
 };
 
