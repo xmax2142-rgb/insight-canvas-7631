@@ -246,7 +246,10 @@ const RemediationAdmin = () => {
           )}
         </div>
       </main>
+
+      <RemediationDialog open={dialogOpen} onOpenChange={setDialogOpen} onSubmit={handleCreate} />
     </div>
+
   );
 };
 
