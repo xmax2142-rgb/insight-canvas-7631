@@ -108,14 +108,22 @@ const RemediationAdmin = () => {
       </header>
 
       <main className="container mx-auto px-6 py-8 space-y-8">
-        <div className="space-y-1">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>Dashboard</span>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-foreground">Remediation Overview</span>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span>Dashboard</span>
+              <ChevronRight className="h-3 w-3" />
+              <span className="text-foreground">Remediation Overview</span>
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight">Remediation Action Plans</h2>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">Remediation Action Plans</h2>
+          {currentUser?.role === "admin" && (
+            <Button onClick={() => setDialogOpen(true)} className="gap-2 transition-all duration-150 active:scale-[0.97]">
+              <Plus className="h-4 w-4" /> New Item
+            </Button>
+          )}
         </div>
+
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <MetricsCard title="Total Items" value={totalItems} icon={FileText} description="All remediation items" accentColor="bg-primary" onClick={() => { setStatusFilter("all"); setPriorityFilter("all"); }} />
