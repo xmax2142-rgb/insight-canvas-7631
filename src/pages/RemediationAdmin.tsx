@@ -44,6 +44,26 @@ const RemediationAdmin = () => {
     navigate('/remediation');
   };
 
+  const handleCreate = (data: RemediationFormValues) => {
+    const assignee = mockUsers.find((u) => u.id === data.assignedTo);
+    const item = addRemediationItem({
+      title: data.title,
+      description: data.description,
+      category: data.category || "General",
+      priority: data.priority,
+      status: data.status,
+      assignedTo: data.assignedTo,
+      assignedToName: assignee?.name ?? "Unassigned",
+      dueDate: data.dueDate,
+      affectedSystems: data.affectedSystems
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    });
+    toast.success(`Remediation item ${item.id} created`);
+  };
+
+
   const totalItems = mockRemediationItems.length;
   const openItems = mockRemediationItems.filter(item => item.status === 'open').length;
   const inProgressItems = mockRemediationItems.filter(item => item.status === 'in_progress').length;
