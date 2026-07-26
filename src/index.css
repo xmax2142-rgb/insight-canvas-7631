@@ -8,64 +8,120 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Warm, sophisticated palette inspired by the design */
-    --background: 36 44% 96%;
-    --foreground: 0 0% 18%;
+    /* Palette: Jungle Green, Baltic Blue, White, Sea Green, Muted Teal */
+    --background: 0 0% 100%;
+    --foreground: 204 66% 18%;
 
-    --card: 33 40% 94%;
-    --card-foreground: 0 0% 18%;
+    --card: 162 30% 98%;
+    --card-foreground: 204 66% 18%;
 
-    --popover: 36 44% 96%;
-    --popover-foreground: 0 0% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 204 66% 18%;
 
-    --primary: 0 0% 18%;
-    --primary-foreground: 36 44% 96%;
+    --primary: 204 66% 32%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 25 30% 70%;
-    --secondary-foreground: 0 0% 18%;
+    --secondary: 162 30% 90%;
+    --secondary-foreground: 204 66% 20%;
 
-    --muted: 33 30% 88%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 162 25% 94%;
+    --muted-foreground: 204 20% 40%;
 
-    --accent: 140 20% 50%;
-    --accent-foreground: 36 44% 96%;
+    --accent: 141 47% 47%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 36 44% 96%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 33 25% 85%;
-    --input: 33 25% 85%;
-    --ring: 0 0% 18%;
+    --border: 162 22% 86%;
+    --input: 162 22% 86%;
+    --ring: 156 66% 33%;
 
     --radius: 1rem;
 
     /* Custom design tokens */
-    --tag-financing: 210 50% 75%;
-    --tag-lifestyle: 140 20% 70%;
-    --tag-community: 25 35% 60%;
-    --tag-wellness: 280 30% 75%;
-    --tag-travel: 195 50% 70%;
-    --tag-creativity: 330 40% 75%;
-    --tag-growth: 50 45% 70%;
+    --tag-financing: 204 66% 45%;
+    --tag-lifestyle: 141 47% 55%;
+    --tag-community: 162 30% 57%;
+    --tag-wellness: 156 66% 40%;
+    --tag-travel: 204 50% 60%;
+    --tag-creativity: 162 40% 50%;
+    --tag-growth: 141 40% 60%;
 
     /* Polish design tokens */
-    --cream: 40 40% 90%;
-    --cream-foreground: 0 0% 18%;
-    --surface-elevated: 36 44% 98%;
-    --shadow-soft: 0 0% 0%;
+    --cream: 162 30% 92%;
+    --cream-foreground: 204 66% 20%;
+    --surface-elevated: 0 0% 100%;
+    --shadow-soft: 204 66% 20%;
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Calendar category tokens */
-    --category-meetings: 220 70% 55%;
-    --category-audits: 280 60% 55%;
-    --category-compliance: 160 60% 45%;
-    --category-training: 35 80% 55%;
+    --category-meetings: 204 66% 32%;
+    --category-audits: 162 30% 45%;
+    --category-compliance: 156 66% 33%;
+    --category-training: 141 47% 47%;
 
     /* Calendar status tokens */
-    --status-completed: 140 60% 45%;
-    --status-overdue: 0 70% 55%;
-    --priority-high: 15 80% 55%;
+    --status-completed: 141 47% 47%;
+    --status-overdue: 0 72% 48%;
+    --priority-high: 25 80% 50%;
   }
+
+  .dark {
+    --background: 204 45% 10%;
+    --foreground: 0 0% 100%;
+
+    --card: 204 40% 14%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 204 45% 10%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 141 47% 47%;
+    --primary-foreground: 204 66% 12%;
+
+    --secondary: 204 35% 22%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 204 30% 20%;
+    --muted-foreground: 162 20% 70%;
+
+    --accent: 156 66% 33%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 204 30% 22%;
+    --input: 204 30% 22%;
+    --ring: 141 47% 47%;
+
+    /* Dark mode tag colors */
+    --tag-financing: 204 50% 40%;
+    --tag-lifestyle: 141 40% 38%;
+    --tag-community: 162 30% 38%;
+    --tag-wellness: 156 50% 32%;
+    --tag-travel: 204 40% 42%;
+    --tag-creativity: 162 35% 40%;
+    --tag-growth: 141 35% 40%;
+
+    /* Dark mode polish tokens */
+    --cream: 204 35% 20%;
+    --cream-foreground: 0 0% 100%;
+    --surface-elevated: 204 40% 16%;
+    --shadow-soft: 0 0% 0%;
+
+    /* Dark calendar category tokens */
+    --category-meetings: 204 60% 45%;
+    --category-audits: 162 30% 50%;
+    --category-compliance: 156 55% 38%;
+    --category-training: 141 45% 45%;
+
+    --status-completed: 141 45% 42%;
+    --status-overdue: 0 60% 50%;
+    --priority-high: 25 70% 48%;
+  }
+
 
   .dark {
     --background: 0 0% 10%;
