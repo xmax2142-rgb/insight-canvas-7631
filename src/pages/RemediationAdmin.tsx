@@ -15,7 +15,6 @@ import { AlertCircle, CheckCircle2, Clock, Shield, Search, LogOut, FileText, Che
 
 const RemediationAdmin = () => {
   const mockRemediationItems = useAppStore((s) => s.remediationItems);
-  const mockRemediationItems = useAppStore((s) => s.remediationItems);
   const addRemediationItem = useAppStore((s) => s.addRemediationItem);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
