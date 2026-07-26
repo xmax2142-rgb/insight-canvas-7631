@@ -15,11 +15,16 @@ import { AlertCircle, CheckCircle2, Clock, Shield, Search, LogOut, FileText, Che
 
 const RemediationAdmin = () => {
   const mockRemediationItems = useAppStore((s) => s.remediationItems);
+  const mockRemediationItems = useAppStore((s) => s.remediationItems);
+  const addRemediationItem = useAppStore((s) => s.addRemediationItem);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<RemediationStatus | "all">("all");
   const [priorityFilter, setPriorityFilter] = useState<RemediationPriority | "all">("all");
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+
 
   useEffect(() => {
     const userStr = localStorage.getItem('mockUser');
