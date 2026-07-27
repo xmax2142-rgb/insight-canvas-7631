@@ -6,6 +6,7 @@ export interface Violation {
   name: string;
   description: string;
   violatingUser: string;
+  violatingUserEmail?: string;
   grcComments: string;
   status: "open" | "closed";
   actionTaken: ActionTaken;
