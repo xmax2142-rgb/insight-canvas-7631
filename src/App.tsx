@@ -54,6 +54,7 @@ const App = () => (
           <Route path="/remediation/item/:id" element={<RemediationItemDetail />} />
           <Route path="/events" element={<Events />} />
           <Route path="/compliance" element={<ComplianceHub />} />
+          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
