@@ -181,7 +181,7 @@ const Index = () => {
             </div>
           </div>
           <div className="pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            <p>© 2025 CyberGRC. All rights reserved.</p>
+            <p>© 2026 CyberGRC. All rights reserved.</p>
           </div>
         </div>
       </footer>
