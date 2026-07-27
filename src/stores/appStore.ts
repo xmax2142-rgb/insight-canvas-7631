@@ -69,6 +69,11 @@ interface AppState {
   updateViolation: (id: string, data: Partial<Omit<Violation, "id" | "number" | "createdAt">>) => Violation | null;
   deleteViolation: (id: string) => boolean;
 
+  // Email templates / settings (persisted to localStorage)
+  emailSettings: EmailSettings;
+  setEmailSettings: (patch: Partial<EmailSettings>) => void;
+  resetEmailSettings: () => void;
+
   // Compliance systems
   complianceSystems: ComplianceSystem[];
   addComplianceSystem: (data: Omit<ComplianceSystem, "id" | "subcategories"> & { subcategories?: Subcategory[] }) => ComplianceSystem;
