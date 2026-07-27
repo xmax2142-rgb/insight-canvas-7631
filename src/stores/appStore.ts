@@ -247,6 +247,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     persistViolations(next);
     return updated;
   },
+  emailSettings: loadEmailSettings(),
+  setEmailSettings: (patch) => {
+    const next = { ...get().emailSettings, ...patch };
+    set({ emailSettings: next });
+    persistEmailSettings(next);
+  },
+  resetEmailSettings: () => {
+    set({ emailSettings: DEFAULT_EMAIL_SETTINGS });
+    persistEmailSettings(DEFAULT_EMAIL_SETTINGS);
+  },
   deleteViolation: (id) => {
     const before = get().violations.length;
     const next = get().violations.filter((v) => v.id !== id);
