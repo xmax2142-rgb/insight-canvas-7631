@@ -10,6 +10,7 @@ import { DeleteDialog } from "@/components/DeleteDialog";
 import { useViolations } from "@/hooks/useViolations";
 import type { Violation, ActionTaken } from "@/types/violation";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { motion } from "framer-motion";
 
 const ViolationsHub = () => {
@@ -52,7 +53,21 @@ const ViolationsHub = () => {
 
   const handleCloseViolation = (id: string, finalDecision: string, actionTaken: ActionTaken) => {
     updateViolation(id, { status: "closed", actionTaken, finalDecision });
-    toast({ title: "Violation closed", description: "The violation has been closed with a final decision." });
+    if (actionTaken === "issue_violation") {
+      toast({ title: "Violation closed", description: "Opening an Outlook draft with the violation notice." });
+    } else {
+      toast({ title: "Violation closed", description: "The violation has been closed with a final decision." });
+    }
+  };
+
+  const handleEmailDrafted = (url: string) => {
+    toast({
+      title: "Outlook draft opened",
+      description: "Review and send the notice from your mail client.",
+      action: (
+        <ToastAction altText="Reopen draft" onClick={() => { window.location.href = url; }}>Reopen draft</ToastAction>
+      ),
+    });
   };
 
   const handleReopen = (v: Violation) => {
@@ -125,7 +140,7 @@ const ViolationsHub = () => {
 
       <ViolationDialog open={dialogOpen} onOpenChange={setDialogOpen} violation={editingViolation} onSubmit={handleSubmit} />
       <DeleteDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)} violationName={deleteTarget?.name ?? ""} onConfirm={handleDeleteConfirm} />
-      <CloseViolationDialog open={!!closeTarget} onOpenChange={(open) => !open && setCloseTarget(null)} violation={closeTarget} onConfirm={handleCloseViolation} />
+      <CloseViolationDialog open={!!closeTarget} onOpenChange={(open) => !open && setCloseTarget(null)} violation={closeTarget} onConfirm={handleCloseViolation} onEmailDrafted={handleEmailDrafted} />
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: canUndo ? 1 : 0.5, y: 0 }} className="fixed bottom-6 left-6 z-50">
         <Button variant="outline" size="sm" onClick={handleUndo} disabled={!canUndo} className="gap-2 rounded-xl shadow-md backdrop-blur-sm bg-card/80 border-border">

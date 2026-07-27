@@ -14,6 +14,7 @@ const schema = z.object({
   name: z.string().min(1, "Violation name is required"),
   description: z.string().min(1, "Description is required"),
   violatingUser: z.string().min(1, "Violating user is required"),
+  violatingUserEmail: z.string().email("Enter a valid email").or(z.literal("")),
   grcComments: z.string(),
   status: z.enum(["open", "closed"]),
   actionTaken: z.enum(["issue_violation", "issue_warning", "no_action"]),
@@ -31,15 +32,15 @@ interface ViolationDialogProps {
 export function ViolationDialog({ open, onOpenChange, violation, onSubmit }: ViolationDialogProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", description: "", violatingUser: "", grcComments: "", status: "open", actionTaken: "no_action" },
+    defaultValues: { name: "", description: "", violatingUser: "", violatingUserEmail: "", grcComments: "", status: "open", actionTaken: "no_action" },
   });
 
   useEffect(() => {
     if (open) {
       if (violation) {
-        form.reset({ name: violation.name, description: violation.description, violatingUser: violation.violatingUser, grcComments: violation.grcComments, status: violation.status, actionTaken: violation.actionTaken ?? "no_action" });
+        form.reset({ name: violation.name, description: violation.description, violatingUser: violation.violatingUser, violatingUserEmail: violation.violatingUserEmail ?? "", grcComments: violation.grcComments, status: violation.status, actionTaken: violation.actionTaken ?? "no_action" });
       } else {
-        form.reset({ name: "", description: "", violatingUser: "", grcComments: "", status: "open", actionTaken: "no_action" });
+        form.reset({ name: "", description: "", violatingUser: "", violatingUserEmail: "", grcComments: "", status: "open", actionTaken: "no_action" });
       }
     }
   }, [open, violation, form]);
@@ -61,6 +62,7 @@ export function ViolationDialog({ open, onOpenChange, violation, onSubmit }: Vio
             <FormField control={form.control} name="name" render={({ field }) => (<FormItem><FormLabel>Violation Name</FormLabel><FormControl><Input placeholder="e.g. Unauthorized Access" {...field} /></FormControl><FormMessage /></FormItem>)} />
             <FormField control={form.control} name="description" render={({ field }) => (<FormItem><FormLabel>Description</FormLabel><FormControl><Textarea placeholder="Describe the violation..." rows={3} {...field} /></FormControl><FormMessage /></FormItem>)} />
             <FormField control={form.control} name="violatingUser" render={({ field }) => (<FormItem><FormLabel>Violating User</FormLabel><FormControl><Input placeholder="User name or ID" {...field} /></FormControl><FormMessage /></FormItem>)} />
+            <FormField control={form.control} name="violatingUserEmail" render={({ field }) => (<FormItem><FormLabel>Violating User Email (optional)</FormLabel><FormControl><Input type="email" placeholder="user@company.com" {...field} /></FormControl><FormMessage /></FormItem>)} />
             <FormField control={form.control} name="grcComments" render={({ field }) => (<FormItem><FormLabel>GRC Comments</FormLabel><FormControl><Textarea placeholder="Analyst comments..." rows={2} {...field} /></FormControl><FormMessage /></FormItem>)} />
             <div className="grid grid-cols-2 gap-4">
               <FormField control={form.control} name="status" render={({ field }) => (<FormItem><FormLabel>Status</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="open">Open</SelectItem><SelectItem value="closed">Closed</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />

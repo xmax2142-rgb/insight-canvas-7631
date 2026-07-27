@@ -5,6 +5,19 @@ import type { CalendarEvent } from "@/types/calendar";
 import type { Violation, ActionTaken } from "@/types/violation";
 import type { ComplianceSystem, Subcategory } from "@/types/compliance";
 import { mockComplianceSystems } from "@/data/mockComplianceSystems";
+import { DEFAULT_EMAIL_SETTINGS, type EmailSettings } from "@/lib/emailTemplates";
+
+const EMAIL_SETTINGS_KEY = "grc-email-settings";
+function loadEmailSettings(): EmailSettings {
+  try {
+    if (typeof window === "undefined") return DEFAULT_EMAIL_SETTINGS;
+    const raw = localStorage.getItem(EMAIL_SETTINGS_KEY);
+    return raw ? { ...DEFAULT_EMAIL_SETTINGS, ...JSON.parse(raw) } : DEFAULT_EMAIL_SETTINGS;
+  } catch { return DEFAULT_EMAIL_SETTINGS; }
+}
+function persistEmailSettings(s: EmailSettings) {
+  try { localStorage.setItem(EMAIL_SETTINGS_KEY, JSON.stringify(s)); } catch {}
+}
 
 export interface Note { id: string; title: string; content: string; date: Date; createdAt: Date; }
 export type TaskPriority = "high" | "medium" | "low";
@@ -68,6 +81,11 @@ interface AppState {
   addViolation: (data: Omit<Violation, "id" | "number" | "createdAt" | "updatedAt">) => Violation;
   updateViolation: (id: string, data: Partial<Omit<Violation, "id" | "number" | "createdAt">>) => Violation | null;
   deleteViolation: (id: string) => boolean;
+
+  // Email templates / settings (persisted to localStorage)
+  emailSettings: EmailSettings;
+  setEmailSettings: (patch: Partial<EmailSettings>) => void;
+  resetEmailSettings: () => void;
 
   // Compliance systems
   complianceSystems: ComplianceSystem[];
@@ -228,6 +246,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ violations: next });
     persistViolations(next);
     return updated;
+  },
+  emailSettings: loadEmailSettings(),
+  setEmailSettings: (patch) => {
+    const next = { ...get().emailSettings, ...patch };
+    set({ emailSettings: next });
+    persistEmailSettings(next);
+  },
+  resetEmailSettings: () => {
+    set({ emailSettings: DEFAULT_EMAIL_SETTINGS });
+    persistEmailSettings(DEFAULT_EMAIL_SETTINGS);
   },
   deleteViolation: (id) => {
     const before = get().violations.length;

@@ -58,6 +58,9 @@ const Header = () => {
             <a href="/events" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
               Events
             </a>
+            <a href="/settings" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
+              Settings
+            </a>
             <a href="/compliance" className="text-sm font-medium hover:bg-muted/60 rounded-full px-4 py-2 transition-all">
               Compliance
             </a>
@@ -108,6 +111,9 @@ const Header = () => {
               </a>
               <a href="/events" className="text-sm font-medium hover:text-accent transition-colors">
                 Events
+              </a>
+              <a href="/settings" className="text-sm font-medium hover:text-accent transition-colors">
+                Settings
               </a>
               <a href="/compliance" className="text-sm font-medium hover:text-accent transition-colors">
                 Compliance
