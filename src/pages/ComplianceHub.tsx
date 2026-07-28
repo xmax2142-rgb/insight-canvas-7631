@@ -23,7 +23,7 @@ import {
   SYSTEM_TYPE_LABELS,
   computeScore,
   computeStatus,
-  rollupControls,
+  rollupAssets,
   type ComplianceStatus,
   type SystemType,
   type Subcategory,
@@ -331,7 +331,8 @@ const ComplianceHub = () => {
                         <div className="text-xs text-muted-foreground italic py-2">No subcategories yet.</div>
                       )}
                       {s.subcategories.map((sub) => {
-                        const subScore = sub.totalControls > 0 ? Math.round((sub.passedControls / sub.totalControls) * 100) : 0;
+                        const subScore = sub.totalAssets > 0 ? Math.round((sub.passedAssets / sub.totalAssets) * 100) : 0;
+                        const failed = Math.max(sub.totalAssets - sub.passedAssets, 0);
                         const subStatus = computeStatus(subScore);
                         const subStyle = statusStyles[subStatus];
                         return (
@@ -349,15 +350,15 @@ const ComplianceHub = () => {
                               </div>
                               <div className="text-[10px] text-muted-foreground mt-1">
                                 <div className="flex items-center justify-between gap-2">
-                                  <span>{sub.passedControls} / {sub.totalControls} controls</span>
-                                  <span className="flex items-center gap-2">
-                                    <span>Assets: <span className="text-foreground font-medium tabular-nums">{sub.totalAssets}</span></span>
-                                    <span className={sub.failedAssets > 0 ? "text-red-600 font-medium" : ""}>
-                                      Failed: <span className="tabular-nums">{sub.failedAssets}</span>
-                                    </span>
+                                  <span>
+                                    Passed: <span className="text-foreground font-medium tabular-nums">{sub.passedAssets} / {sub.totalAssets}</span> assets
+                                  </span>
+                                  <span className={failed > 0 ? "text-red-600 font-medium" : ""}>
+                                    Failed: <span className="tabular-nums">{failed}</span>
                                   </span>
                                 </div>
                               </div>
+                            </div>
                             </div>
                             <div className="flex items-center gap-0.5 shrink-0">
                               <Button
@@ -431,8 +432,6 @@ const ComplianceHub = () => {
           } else {
             addComplianceSystem({
               ...data,
-              passedControls: 0,
-              totalControls: 0,
               lastAssessmentDate: new Date().toISOString().slice(0, 10),
             });
             toast({ title: "Category added", description: data.name });
