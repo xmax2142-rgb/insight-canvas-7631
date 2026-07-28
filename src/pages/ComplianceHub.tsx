@@ -359,7 +359,6 @@ const ComplianceHub = () => {
                                 </div>
                               </div>
                             </div>
-                            </div>
                             <div className="flex items-center gap-0.5 shrink-0">
                               <Button
                                 variant="ghost"
