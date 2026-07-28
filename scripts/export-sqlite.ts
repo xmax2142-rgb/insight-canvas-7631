@@ -99,10 +99,8 @@ CREATE TABLE compliance_subcategories (
   id TEXT PRIMARY KEY,
   system_id TEXT REFERENCES compliance_systems(id),
   name TEXT,
-  total_controls INTEGER,
-  passed_controls INTEGER,
   total_assets INTEGER,
-  failed_assets INTEGER
+  passed_assets INTEGER
 );
 
 CREATE TABLE events (
@@ -166,9 +164,9 @@ for (const sys of mockComplianceSystems as any[]) {
   insert("compliance_systems", ["id", "name", "type", "data_json"], [[sys.id, sys.name, sys.type ?? null, sys]]);
   insert(
     "compliance_subcategories",
-    ["id", "system_id", "name", "total_controls", "passed_controls", "total_assets", "failed_assets"],
+    ["id", "system_id", "name", "total_assets", "passed_assets"],
     (sys.subcategories ?? []).map((s: any) => [
-      s.id, sys.id, s.name, s.totalControls ?? 0, s.passedControls ?? 0, s.totalAssets ?? 0, s.failedAssets ?? 0,
+      s.id, sys.id, s.name, s.totalAssets ?? 0, s.passedAssets ?? 0,
     ]),
   );
 }

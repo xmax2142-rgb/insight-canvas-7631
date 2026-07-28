@@ -173,7 +173,7 @@ const ComplianceHub = () => {
               <h1 className="text-lg font-extrabold tracking-tight text-foreground">
                 Compliance <span className="text-emerald-600">Hub</span>
               </h1>
-              <p className="text-xs font-medium text-muted-foreground">System inventory & control coverage</p>
+              <p className="text-xs font-medium text-muted-foreground">Asset inventory & monthly pass rate</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -281,7 +281,7 @@ const ComplianceHub = () => {
                   <div className="text-4xl font-bold tracking-tight">{s.score}%</div>
                   <div className="text-xs text-muted-foreground text-right">
                     <div className="font-medium text-foreground">{s.rolledPassed} / {s.rolledTotal}</div>
-                    <div>controls passed</div>
+                    <div>assets passed this month</div>
                   </div>
                 </div>
 
