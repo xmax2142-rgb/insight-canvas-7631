@@ -9,7 +9,7 @@ import { useViolations } from "@/hooks/useViolations";
 import { mockRemediationItems } from "@/lib/mockData";
 import { mockEvents } from "@/data/mockEvents";
 import { useAppStore } from "@/stores/appStore";
-import { rollupControls } from "@/types/compliance";
+import { rollupAssets } from "@/types/compliance";
 import { isAfter, startOfToday, isSameDay, startOfDay } from "date-fns";
 
 const hubs = [
@@ -39,7 +39,7 @@ const hubs = [
   },
   {
     title: "Compliance Hub",
-    description: "Inventory of systems in your environment with per-system compliance scores from passed controls.",
+    description: "Inventory of systems in your environment with this month's asset pass rate per category.",
     href: "/compliance",
     icon: ShieldCheck,
     accentColor: "border-l-emerald-500",
@@ -62,7 +62,7 @@ const Index = () => {
   const complianceScore = useMemo(() => {
     const totals = complianceSystems.reduce(
       (acc, s) => {
-        const r = rollupControls(s);
+        const r = rollupAssets(s);
         return { passed: acc.passed + r.passed, total: acc.total + r.total };
       },
       { passed: 0, total: 0 },
