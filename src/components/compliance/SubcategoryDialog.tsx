@@ -16,32 +16,27 @@ interface Props {
 
 export function SubcategoryDialog({ open, onOpenChange, initial, onSave, title }: Props) {
   const [name, setName] = useState("");
-  const [passed, setPassed] = useState(0);
-  const [total, setTotal] = useState(0);
   const [totalAssets, setTotalAssets] = useState(0);
-  const [failedAssets, setFailedAssets] = useState(0);
+  const [passedAssets, setPassedAssets] = useState(0);
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
     if (open) {
       setName(initial?.name ?? "");
-      setPassed(initial?.passedControls ?? 0);
-      setTotal(initial?.totalControls ?? 0);
       setTotalAssets(initial?.totalAssets ?? 0);
-      setFailedAssets(initial?.failedAssets ?? 0);
+      setPassedAssets(initial?.passedAssets ?? 0);
       setNotes(initial?.notes ?? "");
     }
   }, [open, initial]);
 
+  const invalid = !name.trim() || totalAssets < 0 || passedAssets < 0 || passedAssets > totalAssets;
+
   const submit = () => {
-    if (!name.trim() || total < 0 || passed < 0 || passed > total) return;
-    if (totalAssets < 0 || failedAssets < 0 || failedAssets > totalAssets) return;
+    if (invalid) return;
     onSave({
       name: name.trim(),
-      passedControls: passed,
-      totalControls: total,
       totalAssets,
-      failedAssets,
+      passedAssets,
       notes: notes.trim() || undefined,
     });
     onOpenChange(false);
@@ -60,22 +55,17 @@ export function SubcategoryDialog({ open, onOpenChange, initial, onSave, title }
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label>Passed Controls</Label>
-              <Input type="number" min={0} value={passed} onChange={(e) => setPassed(parseInt(e.target.value) || 0)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Total Controls</Label>
-              <Input type="number" min={0} value={total} onChange={(e) => setTotal(parseInt(e.target.value) || 0)} />
-            </div>
-            <div className="space-y-2">
               <Label>Total Assets</Label>
               <Input type="number" min={0} value={totalAssets} onChange={(e) => setTotalAssets(parseInt(e.target.value) || 0)} />
             </div>
             <div className="space-y-2">
-              <Label>Failed Assets</Label>
-              <Input type="number" min={0} value={failedAssets} onChange={(e) => setFailedAssets(parseInt(e.target.value) || 0)} />
+              <Label>Passed Assets (this month)</Label>
+              <Input type="number" min={0} value={passedAssets} onChange={(e) => setPassedAssets(parseInt(e.target.value) || 0)} />
             </div>
           </div>
+          {passedAssets > totalAssets && (
+            <p className="text-xs text-destructive">Passed assets cannot exceed total assets.</p>
+          )}
           <div className="space-y-2">
             <Label>Notes (optional)</Label>
             <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
@@ -83,7 +73,7 @@ export function SubcategoryDialog({ open, onOpenChange, initial, onSave, title }
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={submit}>Save</Button>
+          <Button onClick={submit} disabled={invalid}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -11,10 +11,10 @@ export type SystemType =
 export interface Subcategory {
   id: string;
   name: string;
-  passedControls: number;
-  totalControls: number;
+  /** Total assets in this subcategory. */
   totalAssets: number;
-  failedAssets: number;
+  /** Assets that passed compliance this month. */
+  passedAssets: number;
   notes?: string;
 }
 
@@ -24,9 +24,6 @@ export interface ComplianceSystem {
   type: SystemType;
   owner: string;
   environment: "Production" | "Staging" | "Development";
-  /** Direct control counts used only when subcategories is empty (legacy). */
-  passedControls: number;
-  totalControls: number;
   lastAssessmentDate: string; // ISO date
   notes?: string;
   subcategories: Subcategory[];
@@ -41,22 +38,19 @@ export const SYSTEM_TYPE_LABELS: Record<SystemType, string> = {
   "database": "Databases",
 };
 
-/** Roll up passed/total from subcategories, falling back to direct fields. */
-export function rollupControls(s: ComplianceSystem): { passed: number; total: number } {
-  if (s.subcategories && s.subcategories.length > 0) {
-    return s.subcategories.reduce(
-      (acc, sub) => ({
-        passed: acc.passed + (sub.passedControls || 0),
-        total: acc.total + (sub.totalControls || 0),
-      }),
-      { passed: 0, total: 0 },
-    );
-  }
-  return { passed: s.passedControls || 0, total: s.totalControls || 0 };
+/** Roll up passed/total assets from subcategories. */
+export function rollupAssets(s: ComplianceSystem): { passed: number; total: number } {
+  return (s.subcategories ?? []).reduce(
+    (acc, sub) => ({
+      passed: acc.passed + (sub.passedAssets || 0),
+      total: acc.total + (sub.totalAssets || 0),
+    }),
+    { passed: 0, total: 0 },
+  );
 }
 
 export function computeScore(s: ComplianceSystem): number {
-  const { passed, total } = rollupControls(s);
+  const { passed, total } = rollupAssets(s);
   if (!total) return 0;
   return Math.round((passed / total) * 100);
 }
