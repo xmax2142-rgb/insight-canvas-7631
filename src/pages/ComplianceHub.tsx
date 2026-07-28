@@ -112,7 +112,7 @@ const ComplianceHub = () => {
   const enriched = useMemo(
     () =>
       systems.map((s) => {
-        const { passed, total } = rollupControls(s);
+        const { passed, total } = rollupAssets(s);
         const score = computeScore(s);
         return { ...s, rolledPassed: passed, rolledTotal: total, score, status: computeStatus(score) };
       }),
@@ -122,8 +122,8 @@ const ComplianceHub = () => {
   const overallScore = useMemo(() => {
     if (!enriched.length) return 0;
     const totalPassed = enriched.reduce((sum, s) => sum + s.rolledPassed, 0);
-    const totalControls = enriched.reduce((sum, s) => sum + s.rolledTotal, 0);
-    return totalControls > 0 ? Math.round((totalPassed / totalControls) * 100) : 0;
+    const totalAssets = enriched.reduce((sum, s) => sum + s.rolledTotal, 0);
+    return totalAssets > 0 ? Math.round((totalPassed / totalAssets) * 100) : 0;
   }, [enriched]);
 
   const counts = useMemo(
