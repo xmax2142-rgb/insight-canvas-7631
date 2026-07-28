@@ -101,10 +101,6 @@ const ViolationsHub = () => {
                 <Home className="h-4 w-4" /> Home
               </Button>
             </Link>
-            <Button onClick={handleAdd} className="gap-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-150 active:scale-[0.97]">
-              <Plus className="h-4 w-4" />
-              Add Violation
-            </Button>
           </div>
         </div>
       </motion.header>
@@ -121,6 +117,14 @@ const ViolationsHub = () => {
           <div className="h-px flex-1 bg-border" />
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Violation Records</span>
           <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-muted-foreground">Manage and track security violations</h3>
+          <Button onClick={handleAdd} className="gap-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-150 active:scale-[0.97]">
+            <Plus className="h-4 w-4" />
+            Add Violation
+          </Button>
         </div>
 
         <ViolationsTable violations={violations} onEdit={handleEdit} onDelete={setDeleteTarget} onClose={setCloseTarget} onReopen={handleReopen} />
